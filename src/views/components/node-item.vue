@@ -25,6 +25,9 @@
 
 <script>
 import ClickOutside from "vue-click-outside";
+
+import NodeItemForm from "./node-item-form.vue";
+
 export default {
   name: "nodeItem",
   props: {
@@ -44,6 +47,7 @@ export default {
       },
     },
   },
+
   data() {
     return {
       mouseEnter: false,
@@ -98,18 +102,19 @@ export default {
       this.isActive = false;
     },
     K() {
+      // 打印当前节点信息
+      console.log(JSON.stringify(this.node, null, 4));
       this.newNodeName = this.node.nodeName;
       this.$Modal.confirm({
+        width: 800,
         render: (h) => {
-          return h("Input", {
+          return h(NodeItemForm, {
             props: {
-              value: this.newNodeName,
-              autofocus: true,
+              node: this.node,
             },
             on: {
-              input: (val) => {
-                console.log(`val: ${val}`);
-                this.newNodeName = val;
+              done: function (event) {
+                debugger;
               },
             },
           });
