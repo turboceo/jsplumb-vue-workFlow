@@ -109,8 +109,13 @@
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
-      <el-button @click="resetForm('ruleForm')">重置</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        @click="submitForm('ruleForm')"
+        plain
+        >保存</el-button
+      >
     </el-form-item>
   </el-form>
 </template>
@@ -119,7 +124,7 @@
 import { fetchDataWithCache } from "./util";
 import { whereStrFactory } from "./factory";
 
-import { getUserList, getRoleList } from "./api";
+import { getUserList, getRoleList, getBumenList } from "./api";
 
 export default {
   props: {
@@ -146,20 +151,7 @@ export default {
         whereStr: [whereStrFactory()],
       },
 
-      T_FieldName_Options: [
-        {
-          label: "行政部",
-          value: "111",
-        },
-        {
-          label: "销售部",
-          value: "222",
-        },
-        {
-          label: "研发部",
-          value: "333",
-        },
-      ],
+      T_FieldName_Options: [],
 
       rules: {
         nodeName: [
@@ -200,6 +192,10 @@ export default {
     });
     fetchDataWithCache("getRoleList", getRoleList()).then((res) => {
       this.ruleForm.shenpi.roleOptions = res;
+    });
+
+    fetchDataWithCache("getBumenList", getBumenList()).then((res) => {
+      this.T_FieldName_Options = res;
     });
   },
 };

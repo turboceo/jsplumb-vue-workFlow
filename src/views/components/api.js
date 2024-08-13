@@ -25,4 +25,19 @@ export let getRoleList = () => {
     ]);
 }
 
-export let getBumenList = 90 + .
+export let getBumenList = () => {
+    return Promise.resolve([
+        {
+            label: "行政部",
+            value: "111",
+        },
+        {
+            label: "销售部",
+            value: "222",
+        },
+        {
+            label: "研发部",
+            value: "333",
+        },
+    ])
+}
