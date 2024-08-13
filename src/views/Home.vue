@@ -1,5 +1,17 @@
 <template>
   <div class="flow_region">
+    <div class="flow_region--header">
+      <input
+        v-model="data.title"
+        placeholder="请输入流程名称"
+        :disabled="!isEditMode"
+      />
+      <i
+        class="el-icon-edit"
+        style="cursor: pointer; margin-left: 5px"
+        @click="isEditMode = !isEditMode"
+      ></i>
+    </div>
     <!-- 左测工具栏 -->
     <div class="nodes-wrap">
       <div
@@ -78,7 +90,11 @@ export default {
       currentItem: null,
       nodeTypeList: nodeTypeList,
       nodeTypeObj: {},
+
+      isEditMode: false,
+
       data: {
+        title: "流程名称",
         nodeList: [],
         lineList: [],
       },
@@ -138,8 +154,30 @@ export default {
 
 <style lang="less" scoped>
 .flow_region {
+  &--header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: aliceblue;
+    font-size: 1.5em;
+
+    input {
+      width: 200px;
+      appearance: none;
+      border: none;
+      border-bottom: 1px solid #d2d2d2;
+      background: transparent;
+      padding: 3px 10px;
+      text-align: center;
+      margin-top: 5px;
+    }
+  }
+
   display: flex;
   height: 100%;
+  padding-top: 50px;
   border: 1px solid #ccc;
   .nodes-wrap {
     width: 150px;

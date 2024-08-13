@@ -16,7 +16,8 @@ const nodeTypeList = [{
   nodeName: '文件',
   logImg: require('@/assets/svg/5文件数据.svg'),
   log_bg_color: 'rgba(0, 128, 0, 0.2)'
-}, {
+}
+  , {
   type: 'encode',
   typeName: '加密',
   nodeName: '加密',
@@ -34,6 +35,7 @@ const nodeTypeList = [{
   nodeName: '清洗',
   logImg: require('@/assets/svg/15清洗.svg'),
   log_bg_color: 'rgba(250, 205, 81, 0.2)'
-}]
+}
+]
 
 export { nodeTypeList };

@@ -180,8 +180,15 @@ export default {
   data() {
     return {
       ruleForm: {
+        id: "",
         name: "",
+        type: "",
+        // setInfoList: [
+
+        // ],
         shenpi: {
+          jop: "",
+          NodeName: "",
           // 默认审批人按用户选择
           type: "selectByUser",
           user: [],
@@ -202,6 +209,8 @@ export default {
   },
   methods: {
     handleItemFlagChange(item, flag) {
+      // 重置
+      item.T_FieldName = "";
       let strategy = fetchListStrategies && fetchListStrategies[flag];
       if (!strategy) return;
       strategy && strategy.call(this, item);
