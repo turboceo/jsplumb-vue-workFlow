@@ -1,5 +1,6 @@
 <template>
   <div class="flow_region">
+    <!-- Header -->
     <div class="flow_region--header">
       <input
         v-model="data.title"
@@ -27,6 +28,8 @@
         <div class="name">{{ item.typeName }}</div>
       </div>
     </div>
+
+    <!-- 渲染区域 -->
     <div
       id="flowWrap"
       ref="flowWrap"
