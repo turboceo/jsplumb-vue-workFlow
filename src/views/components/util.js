@@ -13,6 +13,5 @@ export let fetchDataWithCache = async (apiName, apiPromise, adapter) => {
         return
     }
     cache[apiName] = res; // 将结果存储在缓存中
-    console.log(cache)
     return res;
 }

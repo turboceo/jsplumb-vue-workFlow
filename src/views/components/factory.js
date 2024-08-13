@@ -4,5 +4,6 @@ export let whereStrFactory = () => {
         T_FieldName: "",
         T_Operation: "",
         T_Val: "",
+        T_FieldName_Options: []
     };
 };

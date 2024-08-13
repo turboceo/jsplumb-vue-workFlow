@@ -41,3 +41,29 @@ export let getBumenList = () => {
         },
     ])
 }
+
+export let getZuzhiList = () => {
+    return Promise.resolve([
+        {
+            label: "品易智联",
+            value: "company-111",
+        },
+        {
+            label: "测试公司",
+            value: "company-222",
+        }
+    ])
+}
+
+export let getCustomList = () => {
+    return Promise.resolve([
+        {
+            label: "消费金额",
+            value: "c-01",
+        },
+        {
+            label: "发票额",
+            value: "c-02",
+        }
+    ])
+}

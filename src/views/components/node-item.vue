@@ -102,15 +102,27 @@ export default {
       this.isActive = false;
     },
     K() {
-      // 打印当前节点信息
-      console.log(JSON.stringify(this.node, null, 4));
-      this.newNodeName = this.node.nodeName;
+      let node = this.node;
+      if (process.env.NODE_ENV === "development") {
+        node = {
+          id: "3atqi5p6oa4000",
+          left: "560px",
+          logImg: "img/6数据校验.cf8bef7c.svg",
+          log_bg_color: "rgba(163, 117, 233, 0.2)",
+          nodeName: "加密",
+          top: "60px",
+          type: "encode",
+          typeName: "加密",
+        };
+      }
+
+      this.newNodeName = node.nodeName;
       this.$Modal.confirm({
         width: 800,
         render: (h) => {
           return h(NodeItemForm, {
             props: {
-              node: this.node,
+              node,
             },
             on: {
               done: function (event) {
@@ -128,6 +140,10 @@ export default {
     deleteNode() {
       this.$emit("deleteNode", this.node);
     },
+  },
+
+  created() {
+    this.K();
   },
 };
 </script>

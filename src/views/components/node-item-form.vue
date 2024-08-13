@@ -70,6 +70,7 @@
           v-model="item.flag"
           placeholder="请选择"
           style="flex: 0 0 100px"
+          @change="(flag) => handleItemFlagChange(item, flag)"
         >
           <el-option label="部门" value="bumen"></el-option>
           <el-option label="组织" value="zuzhi"></el-option>
@@ -82,7 +83,7 @@
           style="flex: 0 0 200px"
         >
           <el-option
-            v-for="(item, $T_FieldName_OptionIdx) in T_FieldName_Options"
+            v-for="(item, $T_FieldName_OptionIdx) in item.T_FieldName_Options"
             :label="item.label"
             :value="item.value"
             :key="$T_FieldName_OptionIdx"
@@ -124,7 +125,47 @@
 import { fetchDataWithCache } from "./util";
 import { whereStrFactory } from "./factory";
 
-import { getUserList, getRoleList, getBumenList } from "./api";
+import {
+  getUserList,
+  getRoleList,
+  getBumenList,
+  getZuzhiList,
+  getCustomList,
+} from "./api";
+
+/**
+ * 拉取列表策略
+ */
+let fetchListStrategies = {};
+fetchListStrategies.user = function () {
+  fetchDataWithCache("getUserList", getUserList()).then((res) => {
+    this.ruleForm.shenpi.userOptions = res;
+  });
+};
+
+fetchListStrategies.role = function () {
+  fetchDataWithCache("getRoleList", getRoleList()).then((res) => {
+    this.ruleForm.shenpi.roleOptions = res;
+  });
+};
+
+fetchListStrategies.bumen = function (item) {
+  fetchDataWithCache("getBuMenList", getBumenList()).then((res) => {
+    item.T_FieldName_Options = res;
+  });
+};
+
+fetchListStrategies.zuzhi = function (item) {
+  fetchDataWithCache("getZuzhiList", getZuzhiList()).then((res) => {
+    item.T_FieldName_Options = res;
+  });
+};
+
+fetchListStrategies.zidingyi = function (item) {
+  fetchDataWithCache("getCustomList", getCustomList()).then((res) => {
+    item.T_FieldName_Options = res;
+  });
+};
 
 export default {
   props: {
@@ -151,8 +192,6 @@ export default {
         whereStr: [whereStrFactory()],
       },
 
-      T_FieldName_Options: [],
-
       rules: {
         nodeName: [
           { required: true, message: "请输入节点名称", trigger: "blur" },
@@ -162,6 +201,12 @@ export default {
     };
   },
   methods: {
+    handleItemFlagChange(item, flag) {
+      let strategy = fetchListStrategies && fetchListStrategies[flag];
+      if (!strategy) return;
+      strategy && strategy.call(this, item);
+    },
+
     /**
      * 添加审批条件
      */
@@ -187,16 +232,9 @@ export default {
   async created() {
     let ret = Object.assign(this.ruleForm, this.node);
     console.log(ret);
-    fetchDataWithCache("getUserList", getUserList()).then((res) => {
-      this.ruleForm.shenpi.userOptions = res;
-    });
-    fetchDataWithCache("getRoleList", getRoleList()).then((res) => {
-      this.ruleForm.shenpi.roleOptions = res;
-    });
 
-    fetchDataWithCache("getBumenList", getBumenList()).then((res) => {
-      this.T_FieldName_Options = res;
-    });
+    fetchListStrategies.user.call(this);
+    fetchListStrategies.role.call(this);
   },
 };
 </script>
