@@ -1,34 +1,76 @@
 <template>
   <div class="flow_region">
+    <!-- 左测工具栏 -->
     <div class="nodes-wrap">
-      <div v-for="item in nodeTypeList" :key="item.type" class="node" draggable="true" @dragstart="drag($event, item)">
+      <div
+        v-for="item in nodeTypeList"
+        :key="item.type"
+        class="node"
+        draggable="true"
+        @dragstart="drag($event, item)"
+      >
         <div class="log">
-          <img :src="item.logImg" alt="">
+          <img :src="item.logImg" alt="" />
         </div>
-        <div class="name">{{item.typeName}}</div>
+        <div class="name">{{ item.typeName }}</div>
       </div>
     </div>
-    <div id="flowWrap" ref="flowWrap" class="flow-wrap" @drop="drop($event)" @dragover="allowDrop($event)">
+    <div
+      id="flowWrap"
+      ref="flowWrap"
+      class="flow-wrap"
+      @drop="drop($event)"
+      @dragover="allowDrop($event)"
+    >
       <div id="flow">
-        <div v-show="auxiliaryLine.isShowXLine" class="auxiliary-line-x" :style="{width: auxiliaryLinePos.width, top:auxiliaryLinePos.y + 'px', left: auxiliaryLinePos.offsetX + 'px'}"></div>
-        <div v-show="auxiliaryLine.isShowYLine" class="auxiliary-line-y" :style="{height: auxiliaryLinePos.height, left:auxiliaryLinePos.x + 'px', top: auxiliaryLinePos.offsetY + 'px'}"></div>
-        <flowNode v-for="item in data.nodeList" :id="item.id" :key="item.id" :node="item" @setNodeName="setNodeName" @deleteNode = "deleteNode" @changeLineState="changeLineState"></flowNode>
+        <div
+          v-show="auxiliaryLine.isShowXLine"
+          class="auxiliary-line-x"
+          :style="{
+            width: auxiliaryLinePos.width,
+            top: auxiliaryLinePos.y + 'px',
+            left: auxiliaryLinePos.offsetX + 'px',
+          }"
+        ></div>
+        <div
+          v-show="auxiliaryLine.isShowYLine"
+          class="auxiliary-line-y"
+          :style="{
+            height: auxiliaryLinePos.height,
+            left: auxiliaryLinePos.x + 'px',
+            top: auxiliaryLinePos.offsetY + 'px',
+          }"
+        ></div>
+        <flowNode
+          v-for="item in data.nodeList"
+          :id="item.id"
+          :key="item.id"
+          :node="item"
+          @setNodeName="setNodeName"
+          @deleteNode="deleteNode"
+          @changeLineState="changeLineState"
+        ></flowNode>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { jsPlumb } from "jsplumb"
-import { nodeTypeList } from './config/init'
-import { jsplumbSetting, jsplumbConnectOptions, jsplumbSourceOptions, jsplumbTargetOptions } from './config/commonConfig'
-import methods from "./config/methods"
-import data from './config/data.json'
-import flowNode from "./components/node-item"
+import { jsPlumb } from "jsplumb";
+import { nodeTypeList } from "./config/init";
+import {
+  jsplumbSetting,
+  jsplumbConnectOptions,
+  jsplumbSourceOptions,
+  jsplumbTargetOptions,
+} from "./config/commonConfig";
+import methods from "./config/methods";
+import data from "./config/data.json";
+import flowNode from "./components/node-item";
 export default {
   name: "FlowEdit",
   components: {
-    flowNode
+    flowNode,
   },
   data() {
     return {
@@ -38,32 +80,39 @@ export default {
       nodeTypeObj: {},
       data: {
         nodeList: [],
-        lineList: []
+        lineList: [],
       },
       selectedList: [],
       jsplumbSetting: jsplumbSetting,
       jsplumbConnectOptions: jsplumbConnectOptions,
       jsplumbSourceOptions: jsplumbSourceOptions,
       jsplumbTargetOptions: jsplumbTargetOptions,
-      auxiliaryLine: { isShowXLine: false, isShowYLine: false},  //对齐辅助线是否显示
-      auxiliaryLinePos: { width: '100%', height: '100%', offsetX: 0, offsetY: 0, x: 20, y: 20 },
+      auxiliaryLine: { isShowXLine: false, isShowYLine: false }, //对齐辅助线是否显示
+      auxiliaryLinePos: {
+        width: "100%",
+        height: "100%",
+        offsetX: 0,
+        offsetY: 0,
+        x: 20,
+        y: 20,
+      },
       commonGrid: [5, 5], //节点移动最小距离
       selectModuleFlag: false, //多选标识
       rectAngle: {
-        px: '',  //多选框绘制时的起始点横坐标
-        py: '',  //多选框绘制时的起始点纵坐标
+        px: "", //多选框绘制时的起始点横坐标
+        py: "", //多选框绘制时的起始点纵坐标
         left: 0,
         top: 0,
         height: 0,
-        width: 0
-      }
+        width: 0,
+      },
     };
   },
   mounted() {
     this.jsPlumb = jsPlumb.getInstance();
-    this.initNodeTypeObj()
-    this.initNode()
-    this.fixNodesPosition()
+    this.initNodeTypeObj();
+    this.initNode();
+    this.fixNodesPosition();
     this.$nextTick(() => {
       this.init();
     });
@@ -71,28 +120,26 @@ export default {
   methods: {
     ...methods,
     initNodeTypeObj() {
-      nodeTypeList.map(v => {
-        this.nodeTypeObj[v.type] = v
-      })
+      nodeTypeList.map((v) => {
+        this.nodeTypeObj[v.type] = v;
+      });
     },
     initNode() {
-      this.data.lineList = data.lineList
-      data.nodeList.map(v => {
-        v.logImg = this.nodeTypeObj[v.type].logImg
-        v.log_bg_color = this.nodeTypeObj[v.type].log_bg_color
-        this.data.nodeList.push(v)
-      })
+      this.data.lineList = data.lineList;
+      data.nodeList.map((v) => {
+        v.logImg = this.nodeTypeObj[v.type].logImg;
+        v.log_bg_color = this.nodeTypeObj[v.type].log_bg_color;
+        this.data.nodeList.push(v);
+      });
     },
-  }
+  },
 };
 </script>
 
 <style lang="less" scoped>
 .flow_region {
   display: flex;
-  width: 90%;
-  height: 90%;
-  margin: 20px auto;
+  height: 100%;
   border: 1px solid #ccc;
   .nodes-wrap {
     width: 150px;
@@ -105,10 +152,10 @@ export default {
       margin: 5px auto;
       border: 1px solid #ccc;
       line-height: 40px;
-      &:hover{
+      &:hover {
         cursor: grab;
       }
-      &:active{
+      &:active {
         cursor: grabbing;
       }
       .log {
@@ -134,12 +181,12 @@ export default {
       height: 100%;
       .auxiliary-line-x {
         position: absolute;
-        border: .5px dashed #2ab1e8;
+        border: 0.5px dashed #2ab1e8;
         z-index: 9999;
       }
       .auxiliary-line-y {
         position: absolute;
-        border: .5px dashed #2ab1e8;
+        border: 0.5px dashed #2ab1e8;
         z-index: 9999;
       }
     }
@@ -148,7 +195,7 @@ export default {
 </style>
 
 <style lang="less">
-.jtk-connector.active{
+.jtk-connector.active {
   z-index: 9999;
   path {
     stroke: #150042;
