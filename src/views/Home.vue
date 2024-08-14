@@ -85,8 +85,9 @@ import {
   jsplumbTargetOptions,
 } from "./config/commonConfig";
 import methods from "./config/methods";
-import data from "./config/data.json";
 import flowNode from "./components/node-item";
+
+import { getFlowDetial } from "@/views/components/api";
 
 import get from "lodash/get";
 import pick from "lodash/pick";
@@ -140,31 +141,35 @@ export default {
       },
     };
   },
-  mounted() {
-    this.jsPlumb = jsPlumb.getInstance();
-    this.initNodeTypeObj();
-    this.initNode();
-    this.fixNodesPosition();
-    this.$nextTick(() => {
-      this.init();
-    });
-  },
+
   methods: {
     ...methods,
+
+    /**
+     * 初始化节点类型对象
+     */
     initNodeTypeObj() {
       nodeTypeList.map((v) => {
         this.nodeTypeObj[v.type] = v;
       });
     },
+
+    /**
+     * 初始化节点
+     */
     initNode() {
-      this.data.lineList = data.lineList;
-      data.nodeList.map((v) => {
+      let nodeList = this.data.nodeList;
+      let nodeItemAdapter = (v) => {
         v.logImg = this.nodeTypeObj[v.type].logImg;
         v.log_bg_color = this.nodeTypeObj[v.type].log_bg_color;
-        this.data.nodeList.push(v);
-      });
+        return v;
+      };
+      this.data.nodeList = nodeList.map(nodeItemAdapter);
     },
 
+    /**
+     * 保存流程
+     */
     saveFlow() {
       console.log("SAVE FLOW:::)");
 
@@ -206,6 +211,22 @@ export default {
       };
       console.log(JSON.stringify(toBackEndData));
     },
+  },
+
+  async mounted() {
+    let [err, res] = await this.$to(getFlowDetial("DEBUG-888888"));
+    if (err) {
+      this.$message.error("获取流程异常, 请稍后再试");
+      return;
+    }
+    Object.assign(this.data, res);
+    this.jsPlumb = jsPlumb.getInstance();
+    this.initNodeTypeObj();
+    this.initNode();
+    this.fixNodesPosition();
+    this.$nextTick(() => {
+      this.init();
+    });
   },
 };
 </script>
