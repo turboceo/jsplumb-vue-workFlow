@@ -11,126 +11,132 @@
       <el-input v-model="ruleForm.name"></el-input>
     </el-form-item>
 
-    <el-form-item label="审批人">
-      <div style="display: flex; gap: 10px; margin-bottom: 8px">
-        <el-select
-          v-model="ruleForm.shenpi.type"
-          placeholder="请选择"
-          style="flex: 0 0 250px"
-        >
-          <el-option label="按用户审批" value="selectByUser"></el-option>
-          <el-option label="按角色审批" value="selectByRole"></el-option>
-        </el-select>
-
-        <template v-if="ruleForm.shenpi.type === 'selectByUser'">
+    <template v-if="ruleForm.type === 'node'">
+      <el-form-item label="审批人">
+        <div style="display: flex; gap: 10px; margin-bottom: 8px">
           <el-select
-            v-model="ruleForm.shenpi.user"
+            v-model="ruleForm.shenpi.type"
             placeholder="请选择"
-            style="flex: 1"
-            multiple
-            clearable
-            filterable
+            style="flex: 0 0 250px"
           >
-            <el-option
-              v-for="(item, $userOrRoleOptionId) in ruleForm.shenpi.userOptions"
-              :label="item.label"
-              :value="item.value"
-              :key="$userOrRoleOptionId"
-            ></el-option>
+            <el-option label="按用户审批" value="selectByUser"></el-option>
+            <el-option label="按角色审批" value="selectByRole"></el-option>
           </el-select>
-        </template>
 
-        <template v-if="ruleForm.shenpi.type === 'selectByRole'">
-          <el-select
-            v-model="ruleForm.shenpi.role"
-            placeholder="请选择"
-            style="flex: 1"
-            multiple
-            clearable
-            filterable
-          >
-            <el-option
-              v-for="(item, $userOrRoleOptionId) in ruleForm.shenpi.roleOptions"
-              :label="item.label"
-              :value="item.value"
-              :key="$userOrRoleOptionId"
-            ></el-option>
-          </el-select>
-        </template>
-      </div>
-    </el-form-item>
+          <template v-if="ruleForm.shenpi.type === 'selectByUser'">
+            <el-select
+              v-model="ruleForm.shenpi.user"
+              placeholder="请选择"
+              style="flex: 1"
+              multiple
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="(item, $userOrRoleOptionId) in ruleForm.shenpi
+                  .userOptions"
+                :label="item.label"
+                :value="item.value"
+                :key="$userOrRoleOptionId"
+              ></el-option>
+            </el-select>
+          </template>
 
-    <el-form-item label="审批条件">
-      <div
-        style="display: flex; gap: 10px; margin-bottom: 8px"
-        v-for="(item, index) in ruleForm.whereStr"
-        :key="index"
-      >
-        <el-select
-          v-model="item.flag"
-          placeholder="请选择"
-          style="flex: 0 0 150px"
-          @change="(flag) => handleItemFlagChange(item, flag)"
+          <template v-if="ruleForm.shenpi.type === 'selectByRole'">
+            <el-select
+              v-model="ruleForm.shenpi.role"
+              placeholder="请选择"
+              style="flex: 1"
+              multiple
+              clearable
+              filterable
+            >
+              <el-option
+                v-for="(item, $userOrRoleOptionId) in ruleForm.shenpi
+                  .roleOptions"
+                :label="item.label"
+                :value="item.value"
+                :key="$userOrRoleOptionId"
+              ></el-option>
+            </el-select>
+          </template>
+        </div>
+      </el-form-item>
+
+      <el-form-item label="审批条件">
+        <div
+          style="display: flex; gap: 10px; margin-bottom: 8px"
+          v-for="(item, index) in ruleForm.whereStr"
+          :key="index"
         >
-          <el-option label="组织" value="CompanyCode"></el-option>
-          <el-option label="消费金额" value="C01"></el-option>
-          <el-option label="发票额" value="C02"></el-option>
-        </el-select>
-
-        <el-select
-          v-model="item.T_Operation"
-          placeholder="请选择"
-          style="flex: 0 0 100px"
-        >
-          <el-option label="等于" value="="></el-option>
-          <el-option label="不等于" value="!="></el-option>
-          <el-option label="大于" value=">"></el-option>
-          <el-option label="小于" value="<"></el-option>
-        </el-select>
-
-        <!-- 组织部门特殊处理逻辑 -->
-        <template v-if="item.flag === 'CompanyCode'">
           <el-select
-            v-model="item.CompanyCode"
+            v-model="item.flag"
             placeholder="请选择"
-            style="flex: 0 0 200px"
-            @change="
-              (CompanyCode) => handleItemCompanyCodeChange(item, CompanyCode)
-            "
+            style="flex: 0 0 150px"
+            @change="(flag) => handleItemFlagChange(item, flag)"
           >
-            <el-option
-              v-for="(item, $CompanyCode_OptionIdx) in item.CompanyCode_Options"
-              :label="item.label"
-              :value="item.value"
-              :key="$CompanyCode_OptionIdx"
-            ></el-option>
+            <el-option label="组织" value="CompanyCode"></el-option>
+            <el-option label="消费金额" value="C01"></el-option>
+            <el-option label="发票额" value="C02"></el-option>
           </el-select>
 
           <el-select
-            v-show="item.CompanyCode"
-            v-model="item.Bumen"
-            placeholder="请选择部门"
-            style="flex: 1"
+            v-model="item.T_Operation"
+            placeholder="请选择"
+            style="flex: 0 0 100px"
           >
-            <el-option
-              v-for="(item, $Bumen_OptionIdx) in item.Bumen_Options"
-              :label="item.label"
-              :value="item.value"
-              :key="$Bumen_OptionIdx"
-            ></el-option>
+            <el-option label="等于" value="="></el-option>
+            <el-option label="不等于" value="!="></el-option>
+            <el-option label="大于" value=">"></el-option>
+            <el-option label="小于" value="<"></el-option>
           </el-select>
-        </template>
-        <template v-else>
-          <el-input v-model="item.T_Val" placeholder=""> </el-input>
-        </template>
-      </div>
-    </el-form-item>
 
-    <el-form-item>
-      <el-button type="primary" @click="addWhereStr" icon="el-icon-plus"
-        >添加审批条件</el-button
-      >
-    </el-form-item>
+          <!-- 组织部门特殊处理逻辑 -->
+          <template v-if="item.flag === 'CompanyCode'">
+            <el-select
+              v-model="item.CompanyCode"
+              placeholder="请选择"
+              style="flex: 0 0 200px"
+              @change="
+                (CompanyCode) => handleItemCompanyCodeChange(item, CompanyCode)
+              "
+            >
+              <el-option
+                v-for="(
+                  item, $CompanyCode_OptionIdx
+                ) in item.CompanyCode_Options"
+                :label="item.label"
+                :value="item.value"
+                :key="$CompanyCode_OptionIdx"
+              ></el-option>
+            </el-select>
+
+            <el-select
+              v-show="item.CompanyCode"
+              v-model="item.Bumen"
+              placeholder="请选择部门"
+              style="flex: 1"
+            >
+              <el-option
+                v-for="(item, $Bumen_OptionIdx) in item.Bumen_Options"
+                :label="item.label"
+                :value="item.value"
+                :key="$Bumen_OptionIdx"
+              ></el-option>
+            </el-select>
+          </template>
+          <template v-else>
+            <el-input v-model="item.T_Val" placeholder=""> </el-input>
+          </template>
+        </div>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="addWhereStr" icon="el-icon-plus"
+          >添加审批条件</el-button
+        >
+      </el-form-item>
+    </template>
 
     <el-form-item>
       <el-button type="primary" @click="submitForm('ruleForm')" icon=""

@@ -87,6 +87,10 @@ import {
 import methods from "./config/methods";
 import data from "./config/data.json";
 import flowNode from "./components/node-item";
+
+import get from "lodash/get";
+import { whereStrItemAdapter } from "./components/adapter";
+
 export default {
   name: "FlowEdit",
   components: {
@@ -159,7 +163,33 @@ export default {
 
     saveFlow() {
       console.log("SAVE FLOW:::)");
-      console.log(this.data.nodeList);
+      let nodeAdapter = (item) => {
+        let setInfoList = [];
+        let setInfoItem = {
+          whereStr: get(item, "whereStr", []).map(whereStrItemAdapter),
+        };
+        let shenpiObj = get(item, "shenpi", {
+          type: "selectByUser",
+          user: [],
+          role: [],
+          NodeName: "",
+          jop: "",
+        });
+        setInfoItem.type = shenpiObj.type;
+        let joinComma = (arr) => arr.join(",");
+        let splitByComma = (str) => str.split(",");
+
+        // NOTE:
+        // - 不用区分类型直接对数据进行处理
+        setInfoItem.user = joinComma(setInfoItem.user);
+        setInfoItem.role = joinComma(setInfoItem.role);
+
+        item.setInfoItem = setInfoItem;
+        delete item.shenpi;
+        delete item.whereStr;
+        return item;
+      };
+      console.log(this.data.nodeList.map(nodeAdapter));
     },
   },
 };

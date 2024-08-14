@@ -1,6 +1,5 @@
 import panzoom from "panzoom";
 import { GenNonDuplicateID } from "@/common/until";
-
 const methods = {
   init() {
     this.jsPlumb.ready(() => {

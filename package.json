@@ -14,6 +14,7 @@
     "element-ui": "^2.15.14",
     "jquery": "^3.5.1",
     "jsplumb": "^2.15.5",
+    "lodash": "^4.17.21",
     "panzoom": "^9.4.1",
     "view-design": "^4.5.0-beta.3",
     "vue": "^2.6.11",
