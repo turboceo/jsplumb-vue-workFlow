@@ -14,7 +14,7 @@
     <div class="log-wrap">
       <img :src="node.logImg" alt="" />
     </div>
-    <div class="nodeName">{{ node.nodeName }}</div>
+    <div class="nodeName">{{ node.name }}</div>
     <!--连线用--//触发连线的区域-->
     <div class="node-anchor anchor-top" v-show="mouseEnter"></div>
     <div class="node-anchor anchor-right" v-show="mouseEnter"></div>
@@ -114,7 +114,7 @@ export default {
             },
             on: {
               done: function (event) {
-                debugger;
+                Object.assign(node, event);
               },
             },
           });

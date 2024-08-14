@@ -8,7 +8,7 @@
     label-position="top"
   >
     <el-form-item label="节点名称" prop="name">
-      <el-input v-model="ruleForm.nodeName"></el-input>
+      <el-input v-model="ruleForm.name"></el-input>
     </el-form-item>
 
     <el-form-item label="审批人">

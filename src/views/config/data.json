@@ -3,7 +3,7 @@
     {
       "type": "start",
       "typeName": "开始",
-      "nodeName": "开始",
+      "name": "开始",
       "id": "34v56ha2l9c000",
       "top": "160px",
       "left": "100px"
@@ -11,7 +11,7 @@
     {
       "type": "node",
       "typeName": "文件",
-      "nodeName": "文件",
+      "name": "文件",
       "id": "5sdjugrcqhc000",
       "top": "160px",
       "left": "315px"
@@ -19,7 +19,7 @@
     {
       "type": "node",
       "typeName": "加密",
-      "nodeName": "加密",
+      "name": "加密",
       "id": "3atqi5p6oa4000",
       "top": "80px",
       "left": "600px"
@@ -27,7 +27,7 @@
     {
       "type": "node",
       "typeName": "个人服务",
-      "nodeName": "个人服务",
+      "name": "个人服务",
       "id": "49vcu89p5q0000",
       "top": "245px",
       "left": "600px"
@@ -35,7 +35,7 @@
     {
       "type": "node",
       "typeName": "清洗",
-      "nodeName": "清洗",
+      "name": "清洗",
       "id": "1jhiilb0t2tc00",
       "top": "180px",
       "left": "880px"
@@ -43,7 +43,7 @@
     {
       "type": "end",
       "typeName": "结束",
-      "nodeName": "结束",
+      "name": "结束",
       "id": "1ogr3wzy6zhc00",
       "top": "180px",
       "left": "1160px"
