@@ -142,7 +142,7 @@
 
 <script>
 import { fetchDataWithCache } from "./util";
-import { whereStrFactory } from "./factory";
+import { ruleFormFactory, whereStrFactory } from "./factory";
 import { whereStrItemAdapter } from "./adapter";
 
 import {
@@ -199,25 +199,7 @@ export default {
 
   data() {
     return {
-      ruleForm: {
-        id: "",
-        name: "",
-        type: "",
-        // setInfoList: [
-
-        // ],
-        shenpi: {
-          jop: "",
-          NodeName: "",
-          // 默认审批人按用户选择
-          type: "selectByUser",
-          user: [],
-          role: [],
-          userOptions: [],
-          roleOptions: [],
-        },
-        whereStr: [whereStrFactory()],
-      },
+      ruleForm: ruleFormFactory(),
 
       rules: {
         nodeName: [

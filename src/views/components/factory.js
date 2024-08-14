@@ -8,3 +8,22 @@ export let whereStrFactory = () => {
         Bumen_Options: [],
     };
 };
+
+export let ruleFormFactory = () => {
+    return {
+        id: "",
+        name: "",
+        type: "",
+        shenpi: {
+            jop: "",
+            NodeName: "",
+            // 默认审批人按用户选择
+            type: "selectByUser",
+            user: [],
+            role: [],
+            userOptions: [],
+            roleOptions: [],
+        },
+        whereStr: [whereStrFactory()],
+    }
+}

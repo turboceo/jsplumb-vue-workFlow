@@ -30,7 +30,7 @@
         <div class="log">
           <img :src="item.logImg" alt="" />
         </div>
-        <div class="name">{{ item.typeName }}</div>
+        <div class="name">{{ item.name }}</div>
       </div>
     </div>
 
@@ -172,6 +172,7 @@ export default {
     top: 0;
     left: 0;
     right: 0;
+    z-index: 2;
     height: 50px;
     background: aliceblue;
     font-size: 1.5em;
