@@ -68,84 +68,103 @@ export let getCustomList = () => {
     ])
 }
 
+let mockFlowDetial = {
+    "title": "流程名称",
+    "nodeList": [
+        {
+            "id": "2kazl88r91i000",
+            "type": "start",
+            "name": "开始",
+            "top": "220px",
+            "left": "285px",
+            "setInfoList": [
+                {
+                    "whereStr": [
+                        { "flag": "", "T_FieldName": "", "T_Operation": "", "T_Val": "" }
+                    ],
+                    "type": "selectByUser",
+                    "user": "",
+                    "role": ""
+                }
+            ]
+        },
+        {
+            "id": "1zxnkdc88kps00",
+            "type": "node",
+            "name": "审批节点",
+            "top": "160px",
+            "left": "540px",
+            "setInfoList": [
+                {
+                    "whereStr": [
+                        {
+                            "flag": "CompanyCode",
+                            "T_FieldName": "CompanyCode",
+                            "T_Operation": "=",
+                            "T_Val": "zuzhi=company-111&bumen=111"
+                        },
+                        {
+                            "flag": "CompanyCode",
+                            "T_FieldName": "CompanyCode",
+                            "T_Operation": "=",
+                            "T_Val": "zuzhi=company-222"
+                        },
+                        {
+                            "flag": "C01",
+                            "T_FieldName": "C01",
+                            "T_Operation": ">",
+                            "T_Val": "200"
+                        }
+                    ],
+                    "type": "selectByUser",
+                    "user": "00001111,00002222",
+                    "role": ""
+                }
+            ]
+        },
+        {
+            "id": "1lsbu4obh4hs00",
+            "type": "end",
+            "name": "结束",
+            "top": "200px",
+            "left": "1060px",
+            "setInfoList": [
+                {
+                    "whereStr": [
+                        { "flag": "", "T_FieldName": "", "T_Operation": "", "T_Val": "" }
+                    ],
+                    "type": "selectByUser",
+                    "user": "",
+                    "role": ""
+                }
+            ]
+        }
+    ],
+    "lineList": [
+        {
+            "from": "2kazl88r91i000",
+            "to": "1zxnkdc88kps00",
+            "label": "连线名称",
+            "id": "28rddrvjffi80",
+            "Remark": ""
+        },
+        {
+            "from": "1zxnkdc88kps00",
+            "to": "1lsbu4obh4hs00",
+            "label": "连线名称",
+            "id": "4po51bg7qrk000",
+            "Remark": ""
+        }
+    ]
+}
+
 /**
  * 获取流程明细
- * @param {String} flowId 
+ * @param {String} flowId 流程Id
  * @returns 
  */
 export let getFlowDetial = (flowId) => {
     console.log('Flow Id: ', flowId)
-    return Promise.resolve({
-        "title": "流程名称",
-        "nodeList": [
-            {
-                "id": "2kazl88r91i000",
-                "type": "start",
-                "name": "开始",
-                "top": "230px",
-                "left": "290px",
-                "setInfoList": [
-                    {
-                        "whereStr": [
-
-                        ],
-                        "type": "selectByUser",
-                        "user": "",
-                        "role": ""
-                    }
-                ]
-            },
-            {
-                "id": "1zxnkdc88kps00",
-                "type": "node",
-                "name": "审批节点",
-                "top": "160px",
-                "left": "540px",
-                "setInfoList": [
-                    {
-                        "whereStr": [
-
-                        ],
-                        "type": "selectByUser",
-                        "user": "",
-                        "role": ""
-                    }
-                ]
-            },
-            {
-                "id": "1lsbu4obh4hs00",
-                "type": "end",
-                "name": "结束",
-                "top": "200px",
-                "left": "1060px",
-                "setInfoList": [
-                    {
-                        "whereStr": [
-
-                        ],
-                        "type": "selectByUser",
-                        "user": "",
-                        "role": ""
-                    }
-                ]
-            }
-        ],
-        "lineList": [
-            {
-                "from": "2kazl88r91i000",
-                "to": "1zxnkdc88kps00",
-                "label": "连线名称",
-                "id": "28rddrvjffi80",
-                "Remark": ""
-            },
-            {
-                "from": "1zxnkdc88kps00",
-                "to": "1lsbu4obh4hs00",
-                "label": "连线名称",
-                "id": "4po51bg7qrk000",
-                "Remark": ""
-            }
-        ]
-    })
+    return Promise.resolve(mockFlowDetial)
 }
 

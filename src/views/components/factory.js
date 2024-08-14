@@ -9,21 +9,25 @@ export let whereStrFactory = () => {
     };
 };
 
+export let shenpiObjFactory = () => {
+    return {
+        jop: "",
+        NodeName: "",
+        // 默认审批人按用户选择
+        type: "selectByUser",
+        user: [],
+        role: [],
+        userOptions: [],
+        roleOptions: [],
+    }
+}
+
 export let ruleFormFactory = () => {
     return {
         id: "",
         name: "",
         type: "",
-        shenpi: {
-            jop: "",
-            NodeName: "",
-            // 默认审批人按用户选择
-            type: "selectByUser",
-            user: [],
-            role: [],
-            userOptions: [],
-            roleOptions: [],
-        },
+        shenpi: shenpiObjFactory(),
         whereStr: [whereStrFactory()],
     }
 }

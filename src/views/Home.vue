@@ -92,6 +92,7 @@ import { getFlowDetial } from "@/views/components/api";
 import get from "lodash/get";
 import pick from "lodash/pick";
 import { whereStrItemAdapter } from "./components/adapter";
+import { shenpiObjFactory } from "./components/factory";
 
 let joinComma = (arr) => arr.join(",");
 let splitByComma = (str) => str.split(",");
@@ -159,10 +160,16 @@ export default {
      */
     initNode() {
       let nodeList = this.data.nodeList;
-      let nodeItemAdapter = (v) => {
-        v.logImg = this.nodeTypeObj[v.type].logImg;
-        v.log_bg_color = this.nodeTypeObj[v.type].log_bg_color;
-        return v;
+      let nodeItemAdapter = (item) => {
+        item.logImg = this.nodeTypeObj[item.type].logImg;
+        item.log_bg_color = this.nodeTypeObj[item.type].log_bg_color;
+        let setInfoItem = get(item, "setInfoList[0]", shenpiObjFactory());
+        setInfoItem.user = splitByComma(setInfoItem.user).filter(Boolean);
+        setInfoItem.role = splitByComma(setInfoItem.role).filter(Boolean);
+        item.shenpi = pick(setInfoItem, ["type", "user", "role"]);
+        item.whereStr = setInfoItem.whereStr || [];
+        delete item.setInfoList;
+        return item;
       };
       this.data.nodeList = nodeList.map(nodeItemAdapter);
     },
