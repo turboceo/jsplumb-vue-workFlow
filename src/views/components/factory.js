@@ -28,6 +28,7 @@ export let ruleFormFactory = () => {
         name: "",
         type: "",
         shenpi: shenpiObjFactory(),
-        whereStr: [whereStrFactory()],
+        // whereStr: [whereStrFactory()],
+        whereStr: []
     }
 }

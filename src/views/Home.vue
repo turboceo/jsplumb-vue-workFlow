@@ -164,10 +164,35 @@ export default {
         item.logImg = this.nodeTypeObj[item.type].logImg;
         item.log_bg_color = this.nodeTypeObj[item.type].log_bg_color;
         let setInfoItem = get(item, "setInfoList[0]", shenpiObjFactory());
-        setInfoItem.user = splitByComma(setInfoItem.user).filter(Boolean);
-        setInfoItem.role = splitByComma(setInfoItem.role).filter(Boolean);
+
+        setInfoItem.user = Array.isArray(setInfoItem.user)
+          ? setInfoItem.user
+          : splitByComma(setInfoItem.user).filter(Boolean);
+        setInfoItem.role = Array.isArray(setInfoItem.role)
+          ? setInfoItem.user
+          : splitByComma(setInfoItem.role).filter(Boolean);
         item.shenpi = pick(setInfoItem, ["type", "user", "role"]);
-        item.whereStr = setInfoItem.whereStr || [];
+
+        const KEY_MAP = {
+          zuzhi: "CompanyCode",
+          bumen: "Bumen",
+        };
+
+        let whereStrItemAdapter = (item) => {
+          if (item.T_FieldName === "CompanyCode") {
+            item.T_Val.split("&")
+              .map(($item) => $item.split("="))
+              .forEach(($item) => {
+                let key = KEY_MAP && KEY_MAP[$item[0]];
+                let val = $item[1];
+                item[key] = val;
+                console.log(`key: ${key}, val: ${val}`);
+              });
+            item.T_Val = "";
+          }
+          return item;
+        };
+        item.whereStr = (setInfoItem.whereStr || []).map(whereStrItemAdapter);
         delete item.setInfoList;
         return item;
       };
@@ -226,6 +251,27 @@ export default {
       this.$message.error("获取流程异常, 请稍后再试");
       return;
     }
+
+    // res.nodeList.forEach((nodeItem) => {
+    //   nodeItem.setInfoList[0].whereStr = nodeItem.setInfoList[0].whereStr.map(
+    //     (item) => {
+    //       if (item.T_FieldName === "CompanyCode") {
+    //         item.userOptions = [];
+    //         item.roleOptions = [];
+
+    //         item.T_Val.split("&")
+    //           .map(($item) => $item.split("="))
+    //           .forEach(($item) => {
+    //             let key = KEY_MAP && KEY_MAP[$item[0]];
+    //             console.log(`key: ${key}`);
+    //             item[key] = $item[1];
+    //           });
+    //       }
+    //       return item;
+    //     }
+    //   );
+    // });
+
     Object.assign(this.data, res);
     this.jsPlumb = jsPlumb.getInstance();
     this.initNodeTypeObj();

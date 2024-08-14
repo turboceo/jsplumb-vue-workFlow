@@ -119,12 +119,19 @@ export default {
           // 关闭弹窗
           this.$msgbox.close();
         },
+        cancel: function () {
+          debugger;
+          // 关闭弹窗
+          this.$msgbox.close();
+        },
       };
 
       Object.keys(nodeItemConfigDialogMethods).forEach((key) => {
         nodeItemConfigDialogMethods[key] =
           nodeItemConfigDialogMethods[key].bind(this);
       });
+
+      if (node.type !== "node") return;
 
       let customClass =
         node.type === "node" ? this.$style.nodeItemConfigDialog : "";

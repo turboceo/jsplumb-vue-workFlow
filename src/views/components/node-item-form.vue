@@ -132,16 +132,24 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="addWhereStr" icon="el-icon-plus"
+        <el-button
+          type="primary"
+          size="medium"
+          plain
+          @click="addWhereStr"
+          icon="el-icon-plus"
           >添加审批条件</el-button
         >
       </el-form-item>
     </template>
 
     <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')" icon=""
-        >保存</el-button
-      >
+      <div class="action-bar">
+        <el-button type="info" @click="closeDialog" icon="">取消</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')" icon=""
+          >保存</el-button
+        >
+      </div>
     </el-form-item>
   </el-form>
 </template>
@@ -149,7 +157,6 @@
 <script>
 import { fetchDataWithCache } from "./util";
 import { ruleFormFactory, whereStrFactory } from "./factory";
-import { whereStrItemAdapter } from "./adapter";
 
 import {
   getUserList,
@@ -164,31 +171,36 @@ import {
  */
 let fetchListStrategies = {};
 fetchListStrategies.user = function () {
-  fetchDataWithCache("getUserList", getUserList()).then((res) => {
+  return fetchDataWithCache("getUserList", getUserList()).then((res) => {
     this.ruleForm.shenpi.userOptions = res;
   });
 };
 
 fetchListStrategies.role = function () {
-  fetchDataWithCache("getRoleList", getRoleList()).then((res) => {
+  return fetchDataWithCache("getRoleList", getRoleList()).then((res) => {
     this.ruleForm.shenpi.roleOptions = res;
   });
 };
 
-fetchListStrategies.bumen = function (item) {
-  fetchDataWithCache("getBuMenList", getBumenList()).then((res) => {
-    item.Bumen_Options = res;
-  });
+fetchListStrategies.bumen = function (item, CompanyCode) {
+  console.log("<<<< CompanyCode: ${CompanyCode}");
+  return fetchDataWithCache("getBuMenList", getBumenList(CompanyCode)).then(
+    (res) => {
+      item.Bumen_Options = res;
+    }
+  );
 };
 
 fetchListStrategies.CompanyCode = function (item) {
-  fetchDataWithCache("getCompanyCodeList", getCompanyCodeList()).then((res) => {
-    item.CompanyCode_Options = res;
-  });
+  return fetchDataWithCache("getCompanyCodeList", getCompanyCodeList()).then(
+    (res) => {
+      item.CompanyCode_Options = res;
+    }
+  );
 };
 
 fetchListStrategies.zidingyi = function (item) {
-  fetchDataWithCache("getCustomList", getCustomList()).then((res) => {
+  return fetchDataWithCache("getCustomList", getCustomList()).then((res) => {
     item.T_FieldName_Options = res;
   });
 };
@@ -238,6 +250,10 @@ export default {
       this.ruleForm.whereStr.push(whereStrFactory());
     },
 
+    closeDialog() {
+      this.$emit("cancel");
+    },
+
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
@@ -252,11 +268,38 @@ export default {
   },
 
   async created() {
-    let ret = Object.assign(this.ruleForm, this.node);
-    console.log("log ret:");
-    console.log(ret);
+    let f = this.ruleForm;
+    let node = this.node;
+
+    // 遍历每一项判断是否需要调用接口
+    node.whereStr = node.whereStr.map((item) => {
+      if (item.T_FieldName !== "CompanyCode") return item;
+      console.log(item.CompanyCode, item.Bumen);
+      // 判断组织&部门是否有值
+      // 部门需要联动组织进行查询
+      if (item.CompanyCode) {
+        fetchListStrategies.CompanyCode.call(this, item).then(() => {
+          this.$forceUpdate();
+        });
+        fetchListStrategies.bumen
+          .call(this, item, item.CompanyCode)
+          .then(() => {
+            this.$forceUpdate();
+          });
+      }
+      return item;
+    });
+
     fetchListStrategies.user.call(this);
     fetchListStrategies.role.call(this);
+    Object.assign(f, node);
   },
 };
 </script>
+
+<style scoped>
+.action-bar {
+  text-align: center;
+  margin-bottom: -34px;
+}
+</style>
