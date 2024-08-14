@@ -120,7 +120,6 @@ export default {
           this.$msgbox.close();
         },
         cancel: function () {
-          debugger;
           // 关闭弹窗
           this.$msgbox.close();
         },
@@ -136,7 +135,16 @@ export default {
       let customClass =
         node.type === "node" ? this.$style.nodeItemConfigDialog : "";
 
+      const DEFAULT_MSGBOX_CONFIG = {
+        showCancelButton: false,
+        showConfirmButton: false,
+        showClose: false,
+        closeOnClickModal: false,
+        callback(action, instance) {},
+      };
+
       this.$msgbox({
+        ...DEFAULT_MSGBOX_CONFIG,
         title: "节点设置",
         customClass,
         message: h(NodeItemForm, {
@@ -148,8 +156,6 @@ export default {
             ...nodeItemConfigDialogMethods,
           },
         }),
-        showCancelButton: false,
-        showConfirmButton: false,
       });
     },
     deleteNode() {
