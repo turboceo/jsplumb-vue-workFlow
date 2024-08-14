@@ -89,7 +89,11 @@ import data from "./config/data.json";
 import flowNode from "./components/node-item";
 
 import get from "lodash/get";
+import pick from "lodash/pick";
 import { whereStrItemAdapter } from "./components/adapter";
+
+let joinComma = (arr) => arr.join(",");
+let splitByComma = (str) => str.split(",");
 
 export default {
   name: "FlowEdit",
@@ -163,11 +167,9 @@ export default {
 
     saveFlow() {
       console.log("SAVE FLOW:::)");
+
       let nodeAdapter = (item) => {
-        let setInfoList = [];
-        let setInfoItem = {
-          whereStr: get(item, "whereStr", []).map(whereStrItemAdapter),
-        };
+        let obj = pick(item, ["id", "type", "name", "top", "left"]);
         let shenpiObj = get(item, "shenpi", {
           type: "selectByUser",
           user: [],
@@ -175,21 +177,34 @@ export default {
           NodeName: "",
           jop: "",
         });
-        setInfoItem.type = shenpiObj.type;
-        let joinComma = (arr) => arr.join(",");
-        let splitByComma = (str) => str.split(",");
 
-        // NOTE:
-        // - 不用区分类型直接对数据进行处理
-        setInfoItem.user = joinComma(setInfoItem.user);
-        setInfoItem.role = joinComma(setInfoItem.role);
+        let setInfoItem = {
+          whereStr: get(item, "whereStr", [])
+            .map(whereStrItemAdapter)
+            .map((item) => {
+              return pick(item, [
+                "flag",
+                "T_FieldName",
+                "T_Operation",
+                "T_Val",
+              ]);
+            }),
+          type: shenpiObj.type,
+          // NOTE:
+          // - 不用区分类型直接对数据进行处理
+          user: joinComma(shenpiObj.user),
+          role: joinComma(shenpiObj.role),
+        };
 
-        item.setInfoItem = setInfoItem;
-        delete item.shenpi;
-        delete item.whereStr;
-        return item;
+        obj.setInfoList = [setInfoItem];
+        return obj;
       };
-      console.log(this.data.nodeList.map(nodeAdapter));
+      let toBackEndData = {
+        title: this.data.title,
+        nodeList: this.data.nodeList.map(nodeAdapter),
+        lineList: this.data.lineList,
+      };
+      console.log(JSON.stringify(toBackEndData));
     },
   },
 };

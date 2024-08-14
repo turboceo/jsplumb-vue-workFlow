@@ -243,12 +243,6 @@ export default {
         if (!valid) {
           return;
         }
-
-        this.ruleForm.whereStr =
-          this.ruleForm.whereStr.map(whereStrItemAdapter);
-
-        console.log("log formdata: ");
-        console.log(JSON.stringify(this.ruleForm, null, 4));
         this.$emit("done", this.ruleForm);
       });
     },
@@ -259,8 +253,8 @@ export default {
 
   async created() {
     let ret = Object.assign(this.ruleForm, this.node);
+    console.log("log ret:");
     console.log(ret);
-
     fetchListStrategies.user.call(this);
     fetchListStrategies.role.call(this);
   },

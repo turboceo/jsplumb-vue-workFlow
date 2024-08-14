@@ -102,9 +102,14 @@ export default {
     },
     K() {
       let node = this.node;
+      // 节点ID
+      let nodeId = node.id;
+
+      console.log("log node: ");
+      console.log(JSON.stringify(node));
+
       this.newNodeName = node.name;
       const h = this.$createElement;
-      let vm = this;
 
       let nodeItemConfigDialogMethods = {
         done: function (event) {
@@ -125,6 +130,7 @@ export default {
         title: "节点设置",
         customClass: this.$style.nodeItemConfigDialog,
         message: h(NodeItemForm, {
+          key: nodeId,
           props: {
             node,
           },
@@ -141,9 +147,7 @@ export default {
     },
   },
 
-  created() {
-    console.log(this.$style);
-  },
+  created() {},
 };
 </script>
 
@@ -155,7 +159,7 @@ export default {
   position: absolute;
   display: flex;
   height: 40px;
-  width: 120px;
+  width: 150px;
   justify-content: center;
   align-items: center;
   border: 1px solid #b7b6b6;
