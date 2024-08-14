@@ -7,7 +7,7 @@
     class="demo-ruleForm"
     label-position="top"
   >
-    <el-form-item label="节点名称" prop="name">
+    <el-form-item label="节点名称" prop="name" required>
       <el-input v-model="ruleForm.name"></el-input>
     </el-form-item>
 

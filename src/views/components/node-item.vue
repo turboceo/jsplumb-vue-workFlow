@@ -126,9 +126,12 @@ export default {
           nodeItemConfigDialogMethods[key].bind(this);
       });
 
+      let customClass =
+        node.type === "node" ? this.$style.nodeItemConfigDialog : "";
+
       this.$msgbox({
         title: "节点设置",
-        customClass: this.$style.nodeItemConfigDialog,
+        customClass,
         message: h(NodeItemForm, {
           key: nodeId,
           props: {
