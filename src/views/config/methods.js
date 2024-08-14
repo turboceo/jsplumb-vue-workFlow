@@ -16,7 +16,7 @@ const methods = {
         this.addLine(evt)
       });
       //连线双击删除事件
-      this.jsPlumb.bind("dblclick",(conn, originalEvent) => {
+      this.jsPlumb.bind("dblclick", (conn, originalEvent) => {
         this.confirmDelLine(conn)
       })
       //断开连线后，维护本地数据
@@ -86,11 +86,11 @@ const methods = {
   alignForLine(nodeId, position) {
     let showXLine = false, showYLine = false
     this.data.nodeList.some(el => {
-      if(el.id !== nodeId && el.left == position[0]+'px') {
+      if (el.id !== nodeId && el.left == position[0] + 'px') {
         this.auxiliaryLinePos.x = position[0] + 60;
         showYLine = true
       }
-      if(el.id !== nodeId && el.top == position[1]+'px') {
+      if (el.id !== nodeId && el.top == position[1] + 'px') {
         this.auxiliaryLinePos.y = position[1] + 20;
         showXLine = true
       }
@@ -100,11 +100,11 @@ const methods = {
   },
   changeNodePosition(nodeId, pos) {
     this.data.nodeList.some(v => {
-      if(nodeId == v.id) {
-        v.left = pos[0] +'px'
+      if (nodeId == v.id) {
+        v.left = pos[0] + 'px'
         v.top = pos[1] + 'px'
         return true
-      }else {
+      } else {
         return false
       }
     })
@@ -115,14 +115,14 @@ const methods = {
   drop(event) {
     const containerRect = this.jsPlumb.getContainer().getBoundingClientRect();
     const scale = this.getScale();
-    let left = (event.pageX - containerRect.left -60) / scale;
-    let top = (event.pageY - containerRect.top -20) / scale;
+    let left = (event.pageX - containerRect.left - 60) / scale;
+    let top = (event.pageY - containerRect.top - 20) / scale;
 
     var temp = {
       ...this.currentItem,
       id: GenNonDuplicateID(8),
-      top: (Math.round(top/20))*20 + "px",
-      left:  (Math.round(left/20))*20 + "px"
+      top: (Math.round(top / 20)) * 20 + "px",
+      left: (Math.round(left / 20)) * 20 + "px"
     };
     this.addNode(temp);
   },
@@ -148,7 +148,7 @@ const methods = {
   },
   deleLine(line) {
     this.data.lineList.forEach((item, index) => {
-      if(item.from === line.sourceId && item.to === line.targetId) {
+      if (item.from === line.sourceId && item.to === line.targetId) {
         this.data.lineList.splice(index, 1)
       }
     })
@@ -195,7 +195,7 @@ const methods = {
         // let shouldIgnore = !e.ctrlKey
         // return shouldIgnore
       },
-      beforeMouseDown: function(e) {
+      beforeMouseDown: function (e) {
         // allow mouse-down panning only if altKey is down. Otherwise - ignore
         var shouldIgnore = e.ctrlKey;
         return shouldIgnore;
@@ -208,17 +208,17 @@ const methods = {
       const { x, y, scale } = e.getTransform();
       this.jsPlumb.setZoom(scale);
       //根据缩放比例，缩放对齐辅助线长度和位置
-      this.auxiliaryLinePos.width = (1/scale) * 100 + '%'
-      this.auxiliaryLinePos.height = (1/scale) * 100 + '%'
-      this.auxiliaryLinePos.offsetX = -(x/scale)
-      this.auxiliaryLinePos.offsetY = -(y/scale)
+      this.auxiliaryLinePos.width = (1 / scale) * 100 + '%'
+      this.auxiliaryLinePos.height = (1 / scale) * 100 + '%'
+      this.auxiliaryLinePos.offsetX = -(x / scale)
+      this.auxiliaryLinePos.offsetY = -(y / scale)
     });
     pan.on("panend", (e) => {
-      const {x, y, scale} = e.getTransform();
-      this.auxiliaryLinePos.width = (1/scale) * 100 + '%'
-      this.auxiliaryLinePos.height = (1/scale) * 100 + '%'
-      this.auxiliaryLinePos.offsetX = -(x/scale)
-      this.auxiliaryLinePos.offsetY = -(y/scale)
+      const { x, y, scale } = e.getTransform();
+      this.auxiliaryLinePos.width = (1 / scale) * 100 + '%'
+      this.auxiliaryLinePos.height = (1 / scale) * 100 + '%'
+      this.auxiliaryLinePos.offsetX = -(x / scale)
+      this.auxiliaryLinePos.offsetY = -(y / scale)
     })
 
     // 平移时设置鼠标样式
@@ -232,14 +232,14 @@ const methods = {
     mainContainerWrap.addEventListener("mouseup", function wrapMouseup() {
       this.style.cursor = "grab";
     });
-  }, 
+  },
 
   setNodeName(nodeId, name) {
     this.data.nodeList.some((v) => {
-      if(v.id === nodeId) {
-        v.nodeName = name
+      if (v.id === nodeId) {
+        v.name = name
         return true
-      }else {
+      } else {
         return false
       }
     })
@@ -247,12 +247,12 @@ const methods = {
 
   //删除节点
   deleteNode(node) {
-    this.data.nodeList.some((v,index) => {
-      if(v.id === node.id) {
+    this.data.nodeList.some((v, index) => {
+      if (v.id === node.id) {
         this.data.nodeList.splice(index, 1)
         this.jsPlumb.remove(v.id)
         return true
-      }else {
+      } else {
         return false
       }
     })
@@ -263,10 +263,10 @@ const methods = {
     console.log(val)
     let lines = this.jsPlumb.getAllConnections()
     lines.forEach(line => {
-      if(line.targetId === nodeId || line.sourceId === nodeId) {
-        if(val) {
+      if (line.targetId === nodeId || line.sourceId === nodeId) {
+        if (val) {
           line.canvas.classList.add('active')
-        }else {
+        } else {
           line.canvas.classList.remove('active')
         }
       }
@@ -275,7 +275,7 @@ const methods = {
 
   //初始化节点位置  （以便对齐,居中）
   fixNodesPosition() {
-    if(this.data.nodeList && this.$refs.flowWrap) {
+    if (this.data.nodeList && this.$refs.flowWrap) {
       const nodeWidth = 120
       const nodeHeight = 40
       let wrapInfo = this.$refs.flowWrap.getBoundingClientRect()
@@ -288,8 +288,8 @@ const methods = {
       }
       let fixTop = 0, fixLeft = 0;
       this.data.nodeList.forEach(el => {
-        let top = Number(el.top.substring(0, el.top.length -2))
-        let left = Number(el.left.substring(0, el.left.length -2))
+        let top = Number(el.top.substring(0, el.top.length - 2))
+        let left = Number(el.left.substring(0, el.left.length - 2))
         maxLeft = left > maxLeft ? left : maxLeft
         minLeft = left < minLeft ? left : minLeft
         maxTop = top > maxTop ? top : maxTop
@@ -306,11 +306,11 @@ const methods = {
       this.data.nodeList.map(el => {
         let top = Number(el.top.substring(0, el.top.length - 2)) + fixTop;
         let left = Number(el.left.substring(0, el.left.length - 2)) + fixLeft;
-        el.top = (Math.round(top/20))* 20 + 'px'
-        el.left = (Math.round(left/20))*20 + 'px'
+        el.top = (Math.round(top / 20)) * 20 + 'px'
+        el.left = (Math.round(left / 20)) * 20 + 'px'
       })
     }
-  }, 
+  },
 }
 
 export default methods;

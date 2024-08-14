@@ -133,11 +133,7 @@
     </el-form-item>
 
     <el-form-item>
-      <el-button
-        type="primary"
-        size="mini"
-        @click="submitForm('ruleForm')"
-        plain
+      <el-button type="primary" @click="submitForm('ruleForm')" icon=""
         >保存</el-button
       >
     </el-form-item>

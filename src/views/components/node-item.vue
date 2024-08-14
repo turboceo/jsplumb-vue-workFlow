@@ -27,7 +27,6 @@
 import ClickOutside from "vue-click-outside";
 
 import NodeItemForm from "./node-item-form.vue";
-
 export default {
   name: "nodeItem",
   props: {
@@ -103,31 +102,47 @@ export default {
     },
     K() {
       let node = this.node;
+      this.newNodeName = node.name;
+      const h = this.$createElement;
+      let vm = this;
 
-      this.newNodeName = node.nodeName;
-      this.$Modal.confirm({
-        width: 800,
-        render: (h) => {
-          return h(NodeItemForm, {
-            props: {
-              node,
-            },
-            on: {
-              done: function (event) {
-                Object.assign(node, event);
-              },
-            },
-          });
+      let nodeItemConfigDialogMethods = {
+        done: function (event) {
+          Object.assign(node, event);
+          // 设置节点名称
+          this.$emit("setNodeName", node.id, node.name);
+          // 关闭弹窗
+          this.$msgbox.close();
         },
-        onOk: () => {
-          console.log(this.newNodeName);
-          this.$emit("setNodeName", this.node.id, this.newNodeName);
-        },
+      };
+
+      Object.keys(nodeItemConfigDialogMethods).forEach((key) => {
+        nodeItemConfigDialogMethods[key] =
+          nodeItemConfigDialogMethods[key].bind(this);
+      });
+
+      this.$msgbox({
+        title: "节点设置",
+        customClass: this.$style.nodeItemConfigDialog,
+        message: h(NodeItemForm, {
+          props: {
+            node,
+          },
+          on: {
+            ...nodeItemConfigDialogMethods,
+          },
+        }),
+        showCancelButton: false,
+        showConfirmButton: false,
       });
     },
     deleteNode() {
       this.$emit("deleteNode", this.node);
     },
+  },
+
+  created() {
+    console.log(this.$style);
   },
 };
 </script>
@@ -202,5 +217,11 @@ export default {
 .active {
   border: 1px dashed @labelColor;
   box-shadow: 0px 5px 9px 0px rgba(0, 0, 0, 0.5);
+}
+</style>
+
+<style module>
+.nodeItemConfigDialog {
+  width: 800px !important;
 }
 </style>
