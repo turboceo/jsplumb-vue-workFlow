@@ -2,16 +2,21 @@
   <div class="flow_region">
     <!-- Header -->
     <div class="flow_region--header">
-      <input
-        v-model="data.title"
-        placeholder="请输入流程名称"
-        :disabled="!isEditMode"
-      />
-      <i
-        class="el-icon-edit"
-        style="cursor: pointer; margin-left: 5px"
-        @click="isEditMode = !isEditMode"
-      ></i>
+      <div class="flow_region--header---input">
+        <input
+          v-model="data.title"
+          placeholder="请输入流程名称"
+          :disabled="!isEditMode"
+        />
+        <i
+          class="el-icon-edit"
+          style="cursor: pointer; margin-left: 5px"
+          @click="isEditMode = !isEditMode"
+        ></i>
+      </div>
+      <div class="flow_region--header---action">
+        <el-button type="primary" @click="saveFlow">保存流程</el-button>
+      </div>
     </div>
     <!-- 左测工具栏 -->
     <div class="nodes-wrap">
@@ -151,6 +156,11 @@ export default {
         this.data.nodeList.push(v);
       });
     },
+
+    saveFlow() {
+      console.log("SAVE FLOW:::)");
+      console.log(this.data.nodeList);
+    },
   },
 };
 </script>
@@ -165,6 +175,11 @@ export default {
     height: 50px;
     background: aliceblue;
     font-size: 1.5em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 35px;
+    padding-right: 35px;
 
     input {
       width: 200px;
@@ -175,6 +190,7 @@ export default {
       padding: 3px 10px;
       text-align: center;
       margin-top: 5px;
+      height: 32px;
     }
   }
 

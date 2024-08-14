@@ -143,6 +143,7 @@
 <script>
 import { fetchDataWithCache } from "./util";
 import { whereStrFactory } from "./factory";
+import { whereStrItemAdapter } from "./adapter";
 
 import {
   getUserList,
@@ -254,8 +255,12 @@ export default {
         if (!valid) {
           return;
         }
-        console.log("log result: ");
-        console.log(this.ruleForm);
+
+        this.ruleForm.whereStr =
+          this.ruleForm.whereStr.map(whereStrItemAdapter);
+
+        console.log("log formdata: ");
+        console.log(JSON.stringify(this.ruleForm, null, 4));
         this.$emit("done", this.ruleForm);
       });
     },

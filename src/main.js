@@ -3,8 +3,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import Contextmenu from 'vue-contextmenujs'
-import ViewUI from 'view-design';
-import 'view-design/dist/styles/iview.css';
+// import ViewUI from 'view-design';
+// import 'view-design/dist/styles/iview.css';
 import '@/style/index.less'
 
 import ElementUI from 'element-ui';
@@ -17,11 +17,8 @@ Vue.config.productionTip = false
 
 Vue.prototype.$to = $to
 
-import ElDialogHelper from "@springleo/el-dialog-helper";
-Vue.use(ElDialogHelper);
-
 Vue.use(Contextmenu);
-Vue.use(ViewUI);
+// Vue.use(ViewUI);
 new Vue({
   router,
   store,
