@@ -17,6 +17,9 @@ Vue.config.productionTip = false
 
 Vue.prototype.$to = $to
 
+import ElDialogHelper from "@springleo/el-dialog-helper";
+Vue.use(ElDialogHelper);
+
 Vue.use(Contextmenu);
 Vue.use(ViewUI);
 new Vue({

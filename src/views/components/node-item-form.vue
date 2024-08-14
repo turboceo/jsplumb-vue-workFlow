@@ -69,25 +69,12 @@
         <el-select
           v-model="item.flag"
           placeholder="请选择"
-          style="flex: 0 0 100px"
+          style="flex: 0 0 150px"
           @change="(flag) => handleItemFlagChange(item, flag)"
         >
-          <el-option label="部门" value="bumen"></el-option>
-          <el-option label="组织" value="zuzhi"></el-option>
-          <el-option label="自定义" value="zidingyi"></el-option>
-        </el-select>
-
-        <el-select
-          v-model="item.T_FieldName"
-          placeholder="请选择"
-          style="flex: 0 0 200px"
-        >
-          <el-option
-            v-for="(item, $T_FieldName_OptionIdx) in item.T_FieldName_Options"
-            :label="item.label"
-            :value="item.value"
-            :key="$T_FieldName_OptionIdx"
-          ></el-option>
+          <el-option label="组织" value="CompanyCode"></el-option>
+          <el-option label="消费金额" value="C01"></el-option>
+          <el-option label="发票额" value="C02"></el-option>
         </el-select>
 
         <el-select
@@ -97,9 +84,45 @@
         >
           <el-option label="等于" value="="></el-option>
           <el-option label="不等于" value="!="></el-option>
+          <el-option label="大于" value=">"></el-option>
+          <el-option label="小于" value="<"></el-option>
         </el-select>
 
-        <el-input v-model="item.T_Val" placeholder=""> </el-input>
+        <!-- 组织部门特殊处理逻辑 -->
+        <template v-if="item.flag === 'CompanyCode'">
+          <el-select
+            v-model="item.CompanyCode"
+            placeholder="请选择"
+            style="flex: 0 0 200px"
+            @change="
+              (CompanyCode) => handleItemCompanyCodeChange(item, CompanyCode)
+            "
+          >
+            <el-option
+              v-for="(item, $CompanyCode_OptionIdx) in item.CompanyCode_Options"
+              :label="item.label"
+              :value="item.value"
+              :key="$CompanyCode_OptionIdx"
+            ></el-option>
+          </el-select>
+
+          <el-select
+            v-show="item.CompanyCode"
+            v-model="item.Bumen"
+            placeholder="请选择部门"
+            style="flex: 1"
+          >
+            <el-option
+              v-for="(item, $Bumen_OptionIdx) in item.Bumen_Options"
+              :label="item.label"
+              :value="item.value"
+              :key="$Bumen_OptionIdx"
+            ></el-option>
+          </el-select>
+        </template>
+        <template v-else>
+          <el-input v-model="item.T_Val" placeholder=""> </el-input>
+        </template>
       </div>
     </el-form-item>
 
@@ -129,7 +152,7 @@ import {
   getUserList,
   getRoleList,
   getBumenList,
-  getZuzhiList,
+  getCompanyCodeList,
   getCustomList,
 } from "./api";
 
@@ -151,13 +174,13 @@ fetchListStrategies.role = function () {
 
 fetchListStrategies.bumen = function (item) {
   fetchDataWithCache("getBuMenList", getBumenList()).then((res) => {
-    item.T_FieldName_Options = res;
+    item.Bumen_Options = res;
   });
 };
 
-fetchListStrategies.zuzhi = function (item) {
-  fetchDataWithCache("getZuzhiList", getZuzhiList()).then((res) => {
-    item.T_FieldName_Options = res;
+fetchListStrategies.CompanyCode = function (item) {
+  fetchDataWithCache("getCompanyCodeList", getCompanyCodeList()).then((res) => {
+    item.CompanyCode_Options = res;
   });
 };
 
@@ -212,6 +235,13 @@ export default {
       // 重置
       item.T_FieldName = "";
       let strategy = fetchListStrategies && fetchListStrategies[flag];
+      if (!strategy) return;
+      strategy && strategy.call(this, item);
+    },
+
+    handleItemCompanyCodeChange(item, CompanyCode) {
+      if (!CompanyCode) return;
+      let strategy = fetchListStrategies && fetchListStrategies["bumen"];
       if (!strategy) return;
       strategy && strategy.call(this, item);
     },

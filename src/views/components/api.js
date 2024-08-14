@@ -42,7 +42,7 @@ export let getBumenList = () => {
     ])
 }
 
-export let getZuzhiList = () => {
+export let getCompanyCodeList = () => {
     return Promise.resolve([
         {
             label: "品易智联",
