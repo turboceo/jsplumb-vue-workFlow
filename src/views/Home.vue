@@ -351,7 +351,7 @@ export default {
     overflow: hidden;
     outline: none !important;
     flex-grow: 1;
-    background-image: url("../assets/point.png");
+    background-image: url("../flowDesignResource/point.png");
     #flow {
       position: relative;
       width: 100%;
