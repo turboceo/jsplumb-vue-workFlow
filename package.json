@@ -2,6 +2,7 @@
   "name": "jsplumb-vue-wordflow",
   "version": "0.1.0",
   "private": true,
+  "main": "index.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -9,6 +10,7 @@
   },
   "dependencies": {
     "@springleo/el-dialog-helper": "^0.1.5",
+    "async": "^3.2.5",
     "await-to-js": "^3.0.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.14",
