@@ -120,32 +120,7 @@
 </template>
 
 <script>
-import { fetchDataWithCache } from "./util";
 import { ruleFormFactory, whereStrFactory } from "./factory";
-
-import { getUserList, getRoleList, getCustomList } from "./api";
-
-/**
- * 拉取列表策略
- */
-let fetchListStrategies = {};
-fetchListStrategies.user = function () {
-  return fetchDataWithCache("getUserList", getUserList()).then((res) => {
-    this.ruleForm.shenpi.userOptions = res;
-  });
-};
-
-fetchListStrategies.role = function () {
-  return fetchDataWithCache("getRoleList", getRoleList()).then((res) => {
-    this.ruleForm.shenpi.roleOptions = res;
-  });
-};
-
-fetchListStrategies.zidingyi = function (item) {
-  return fetchDataWithCache("getCustomList", getCustomList()).then((res) => {
-    item.T_FieldName_Options = res;
-  });
-};
 
 export default {
   props: {
@@ -222,8 +197,6 @@ export default {
       return item;
     });
 
-    fetchListStrategies.user.call(this);
-    fetchListStrategies.role.call(this);
     Object.assign(f, node);
   },
 };

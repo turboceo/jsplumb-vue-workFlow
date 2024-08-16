@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flow_region--header">
       <div class="flow_region--header---input">
-        {{ data.title }}
+        {{ flowBaseInfo.SchemeName }}
       </div>
       <div class="flow_region--header---action">
         <el-button type="primary" @click="saveFlow">保存流程</el-button>
@@ -84,6 +84,8 @@ import { saveFlow } from "@/utils/service";
 import get from "lodash/get";
 import pick from "lodash/pick";
 import { whereStrItemAdapter } from "./components/adapter";
+// TODO:
+// - Check the logic
 import { shenpiObjFactory } from "./components/factory";
 
 let joinComma = (arr) => arr.join(",");
@@ -94,20 +96,23 @@ const OptionMixin = {
   data() {
     return {
       flowBaseInfo: {
-        // // 流程名称
-        // SchemeName: "",
-        // // 流程类型
-        // FrmId: "",
-        // whereStr: [],
+        id: "",
+        // 流程名称
+        SchemeName: "",
+        // 流程类型
+        FrmId: "",
+        whereStr: [],
 
-        SchemeName: "dafdafda",
-        FrmId: "flowschemeType_qingjia",
-        whereStr: [
-          {
-            CompanyCode: "D01D001",
-            Bumen: ["D01D003", "D01D004", "D01D005"],
-          },
-        ],
+        // TODO:
+        // - Remove
+        // SchemeName: "dafdafda",
+        // FrmId: "flowschemeType_qingjia",
+        // whereStr: [
+        //   {
+        //     CompanyCode: "D01D001",
+        //     Bumen: ["D01D003", "D01D004", "D01D005"],
+        //   },
+        // ],
       },
 
       pageOptions: {
@@ -139,10 +144,10 @@ export default {
       isEditMode: false,
 
       data: {
-        title: "流程名称",
         nodeList: [],
         lineList: [],
       },
+
       selectedList: [],
       jsplumbSetting: jsplumbSetting,
       jsplumbConnectOptions: jsplumbConnectOptions,
@@ -320,16 +325,16 @@ export default {
       this.$store.commit("updatePageOptions", this.pageOptions);
     },
 
-    renderFlow() {
+    async renderFlow() {
       // 绘制流程
       this.jsPlumb = jsPlumb.getInstance();
       this.initNodeTypeObj();
       this.initNode();
       this.fixNodesPosition();
-      this.$nextTick(() => {
-        this.init();
-        this.showCreateFlowDialog();
-      });
+      await this.$nextTick();
+      this.init();
+      // 延迟弹窗显示避免流程图渲染异常
+      this.isAddMode && this.showCreateFlowDialog();
     },
 
     /**
@@ -387,19 +392,24 @@ export default {
   async mounted() {
     // 获取下拉选项
     this.getPageOptions();
-    let { mode, token } = this.$route.query;
+    let { mode, id, token } = this.$route.query;
 
     let isAddMode = mode === "add";
     this.isAddMode = isAddMode;
 
-    if (!isAddMode) {
-      let [err, res] = await this.$to(getFlowDetial("DEBUG-888888"));
+    if (mode === "edit") {
+      let [err, res] = await this.$to(getFlowDetial(id));
       if (err) {
         this.$message.error("获取流程异常, 请稍后再试");
         return;
       }
-      Object.assign(this.data, res);
-      return;
+
+      let mix = Object.assign;
+      let parseJSON = (str) => JSON.parse(str);
+      let obj$1 = pick(res, ["id", "SchemeName", "FrmId"]);
+      obj$1.whereStr = parseJSON(res.SchemeContent);
+      mix(this.flowBaseInfo, obj$1);
+      mix(this.data, parseJSON(res.SchemeContent));
     }
 
     this.renderFlow();
@@ -412,11 +422,13 @@ export default {
   &--header {
     position: fixed;
     top: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2;
-    height: 50px;
-    background: aliceblue;
+    width: 500px;
+    height: 70px;
+    background: #409eff73;
+    border-radius: 0 0 10px 10px;
     font-size: 1.5em;
     display: flex;
     justify-content: space-between;
@@ -439,12 +451,13 @@ export default {
 
   display: flex;
   height: 100%;
-  padding-top: 50px;
   border: 1px solid #ccc;
   .nodes-wrap {
-    width: 150px;
+    width: 200px;
     height: 100%;
     border-right: 1px solid #ccc;
+    padding-top: 20px;
+
     .node {
       display: flex;
       height: 40px;
