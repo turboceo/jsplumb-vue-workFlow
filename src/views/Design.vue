@@ -199,7 +199,6 @@ export default {
         item.logImg = this.nodeTypeObj[item.type].logImg;
         item.log_bg_color = this.nodeTypeObj[item.type].log_bg_color;
         let setInfoItem = get(item, "setInfoList[0]", shenpiObjFactory());
-
         setInfoItem.user = Array.isArray(setInfoItem.user)
           ? setInfoItem.user
           : splitByComma(setInfoItem.user).filter(Boolean);
@@ -207,13 +206,6 @@ export default {
           ? setInfoItem.user
           : splitByComma(setInfoItem.role).filter(Boolean);
         item.shenpi = pick(setInfoItem, ["type", "user", "role"]);
-
-        debugger;
-
-        const KEY_MAP = {
-          zuzhi: "CompanyCode",
-          bumen: "Bumen",
-        };
 
         item.whereStr = setInfoItem.whereStr || [];
         delete item.setInfoList;
@@ -256,6 +248,8 @@ export default {
       };
 
       let toJSON = (obj) => JSON.stringify(obj);
+
+      // 流程数据回显
       let toBackEndData = {
         id: "",
         SchemeName: this.flowBaseInfo.SchemeName,
