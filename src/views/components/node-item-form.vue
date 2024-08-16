@@ -70,7 +70,7 @@
         <el-select
           v-model="item.T_FieldName"
           placeholder="请选择"
-          style="flex: 0 0 100px"
+          style="flex: 0 0 200px"
           clearable
           filterable
         >

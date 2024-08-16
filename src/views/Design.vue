@@ -90,10 +90,6 @@ let splitByComma = (str) => str.split(",");
 
 import FlowBaseInfoPanel from "./components/FlowBaseInfoPanel.vue";
 const OptionMixin = {
-  // components: {
-  //   FlowBaseInfoPanel: () => import("./components/FlowBaseInfoPanel"),
-  // },
-
   data() {
     return {
       flowBaseInfo: {
