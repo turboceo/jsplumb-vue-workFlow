@@ -1,5 +1,5 @@
 import panzoom from "panzoom";
-import { GenNonDuplicateID } from "@/FlowDesign/common/until";
+import { GenNonDuplicateID } from "@/views/common/until";
 const methods = {
   init() {
     this.jsPlumb.ready(() => {
