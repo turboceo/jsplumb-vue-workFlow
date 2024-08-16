@@ -1,0 +1,18 @@
+/* 改变主题色变量 */
+$--button-primary-background-color: #0482b0;
+$--button-primary-border-color: #0482b0;
+
+$--message-danger-font-color: #f95520;
+
+$--input-disabled-color: #151515e0 !default;
+
+$--custom--border-radius-base: 8px !default;
+$--button-border-radius: $--custom--border-radius-base !default;
+$--button-medium-border-radius: $--custom--border-radius-base !default;
+$--button-small-border-radius: #{$--custom--border-radius-base - 1} !default;
+$--button-mini-border-radius: #{$--custom--border-radius-base - 1} !default;
+
+/* 改变 icon 字体路径变量，必需 */
+$--font-path: "~element-ui/lib/theme-chalk/fonts";
+
+@import "~element-ui/packages/theme-chalk/src/index";

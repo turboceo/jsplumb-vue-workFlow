@@ -1,0 +1,168 @@
+.u-relative {
+  position: relative;
+}
+
+.u-absolute {
+  position: absolute;
+}
+
+.u-flex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.u-flex-wrap {
+  flex-wrap: wrap;
+}
+
+.u-flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+.u-col-center {
+  align-items: center;
+}
+
+.u-col-top {
+  align-items: flex-start;
+}
+
+.u-col-bottom {
+  align-items: flex-end;
+}
+
+.u-col-stretch {
+  align-items: stretch;
+}
+
+.u-row-center {
+  justify-content: center;
+}
+
+.u-flex-evenly {
+  justify-content: space-evenly;
+}
+
+.u-row-left {
+  justify-content: flex-start;
+}
+
+.u-row-right {
+  justify-content: flex-end;
+}
+
+.u-row-between {
+  justify-content: space-between;
+}
+
+.u-row-around {
+  justify-content: space-around;
+}
+
+.u-text-left {
+  text-align: left;
+}
+
+.u-text-center {
+  text-align: center;
+}
+
+.u-text-right {
+  text-align: right;
+}
+
+.u-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.u-flex-row-reverse {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.for(@i, @end) when (@i <= @end) {
+  .u-flex-@{i} {
+    flex: @i;
+  }
+  .for(@i + 1, @end);
+}
+.for(0, 12); // Generates classes from .u-flex-0 to .u-flex-12
+
+.clearfix::before,
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.font-weight-300 {
+  font-weight: 300;
+}
+
+// overflow
+.u-overflow-hidden {
+  overflow: hidden;
+}
+
+.u-overflow-auto {
+  overflow: auto;
+}
+
+.border-box {
+  box-sizing: border-box;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+// Cursor
+.u-cursor-pointer {
+  cursor: pointer;
+}
+
+.u-b-t-reset {
+  border-top: none 0 !important;
+}
+
+// // 重写Element UI部分样式
+// .custom-select {
+//   ::v-deep .el-input__inner {
+//       border: none;
+//   }
+// }
+
+.u-table {
+  display: table;
+}
+
+.u-table-cell {
+  display: table-cell;
+}
+
+.u-user-select-none {
+  user-select: none;
+}
+
+// margin util
+.u-m-l-a {
+  margin-left: auto !important;
+}
+
+.u-m-l-r {
+  margin-right: auto !important;
+}
+
+.d-flex {
+  display: flex;
+}

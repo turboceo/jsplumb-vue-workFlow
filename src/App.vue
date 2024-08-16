@@ -4,6 +4,15 @@
   </div>
 </template>
 
+<script>
+export default {
+  // created() {
+  //   console.log(this.$route);
+  //   // console.log(this.$route.query);
+  // },
+};
+</script>
+
 <style lang="less">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

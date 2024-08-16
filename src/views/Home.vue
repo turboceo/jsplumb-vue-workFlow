@@ -1,395 +1,650 @@
 <template>
-  <div class="flow_region">
-    <!-- Header -->
-    <div class="flow_region--header">
-      <div class="flow_region--header---input">
-        <input
-          v-model="data.title"
-          placeholder="请输入流程名称"
-          :disabled="!isEditMode"
-        />
-        <i
-          class="el-icon-edit"
-          style="cursor: pointer; margin-left: 5px"
-          @click="isEditMode = !isEditMode"
-        ></i>
-      </div>
-      <div class="flow_region--header---action">
-        <el-button type="primary" @click="saveFlow">保存流程</el-button>
-      </div>
-    </div>
-    <!-- 左测工具栏 -->
-    <div class="nodes-wrap">
-      <div
-        v-for="item in nodeTypeList"
-        :key="item.type"
-        class="node"
-        draggable="true"
-        @dragstart="drag($event, item)"
+  <div class="u-relative d-flex u-flex-col u-flex-1 w-full">
+    <div class="table-action">
+      <el-button
+        size="mini"
+        @click="doAction('add')"
+        class="u-m-l-10"
+        type="primary"
+        v-if="
+          $hasPerm({
+            p: ['archives:inventory:add'],
+          })
+        "
+        >新增</el-button
       >
-        <div class="log">
-          <img :src="item.logImg" alt="" />
-        </div>
-        <div class="name">{{ item.name }}</div>
-      </div>
+      <el-input
+        style="width: 200px"
+        size="mini"
+        v-model="queryParams.title"
+        class="u-m-l-10"
+        filterable
+        clearable
+        placeholder="请输入流程名称"
+      >
+      </el-input>
+      <el-button
+        size="mini"
+        @click="doAction('search')"
+        class="u-m-l-10"
+        style="background: #0482b0; color: #fefefe"
+        >查 询</el-button
+      >
     </div>
 
-    <!-- 渲染区域 -->
+    <!-- Table 表格区 -->
+    <div ref="table" class="section--body u-flex-1">
+      <el-table
+        ref="tables"
+        :data="tableData"
+        border
+        stripe
+        :header-cell-style="{ background: '#f4f3f9', color: '#606266' }"
+        :height="tableHeight"
+        style="width: 100%"
+        @selection-change="handleSelectionChange"
+        @sort-change="sortchange"
+        @row-click="rowclick"
+        :highlight-current-row="true"
+        v-loading="isTableLoading"
+        class="custom--table"
+        tooltip-effect="dark"
+      >
+        <el-table-column type="selection" width="55" align="center">
+        </el-table-column>
+
+        <el-table-column
+          fixed
+          type="index"
+          label="序号"
+          :resizable="false"
+          width="70"
+          align="center"
+        >
+        </el-table-column>
+
+        <el-table-column prop="schemeName" label="流程名称" align="center">
+        </el-table-column>
+
+        <el-table-column prop="createUserName" label="创建人" align="center">
+        </el-table-column>
+
+        <el-table-column fixed="right" label="操作" width="100" align="center">
+          <template slot-scope="scope">
+            <el-button
+              @click="doAction('viewDetial', scope.row.ID)"
+              type="text"
+              size="mini"
+              >查看</el-button
+            >
+            <el-button
+              @click="doAction('editFlow', scope.row)"
+              type="text"
+              size="mini"
+              v-if="$hasPerm({ p: ['archives:inventory:edit'] })"
+              >编辑</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
+    <!-- 分页 -->
     <div
-      id="flowWrap"
-      ref="flowWrap"
-      class="flow-wrap"
-      @drop="drop($event)"
-      @dragover="allowDrop($event)"
+      class="table-footer pl-15 pr-15 text-left"
+      style="
+        box-shadow: none;
+        background: none;
+        box-sizing: border-box;
+        padding-top: 20px;
+      "
     >
-      <div id="flow">
-        <div
-          v-show="auxiliaryLine.isShowXLine"
-          class="auxiliary-line-x"
-          :style="{
-            width: auxiliaryLinePos.width,
-            top: auxiliaryLinePos.y + 'px',
-            left: auxiliaryLinePos.offsetX + 'px',
-          }"
-        ></div>
-        <div
-          v-show="auxiliaryLine.isShowYLine"
-          class="auxiliary-line-y"
-          :style="{
-            height: auxiliaryLinePos.height,
-            left: auxiliaryLinePos.x + 'px',
-            top: auxiliaryLinePos.offsetY + 'px',
-          }"
-        ></div>
-        <flowNode
-          v-for="item in data.nodeList"
-          :id="item.id"
-          :key="item.id"
-          :node="item"
-          @setNodeName="setNodeName"
-          @deleteNode="deleteNode"
-          @changeLineState="changeLineState"
-        ></flowNode>
+      <div class="summary-bar"></div>
+      <div class="pagination-nav">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+          :current-page.sync="pagination.current"
+          :page-sizes="paginationSizes"
+          :page-size="pagination.size"
+          layout="total, prev, pager, next, sizes"
+          :total="total"
+          background
+        >
+        </el-pagination>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { jsPlumb } from "jsplumb";
-import { nodeTypeList } from "./config/init";
-import {
-  jsplumbSetting,
-  jsplumbConnectOptions,
-  jsplumbSourceOptions,
-  jsplumbTargetOptions,
-} from "./config/commonConfig";
-import methods from "./config/methods";
-import flowNode from "./components/node-item";
+import { getFLowList, loadClearList, getChedui } from "@/utils/service";
+import { throttle, debounce } from "throttle-debounce";
+import { setToken } from "@/util/index";
 
-import { getFlowDetial } from "./components/api";
+// change事件处理
+const handleChange = {
+  methods: {},
+};
 
-import get from "lodash/get";
-import pick from "lodash/pick";
-import { whereStrItemAdapter } from "./components/adapter";
-import { shenpiObjFactory } from "./components/factory";
-
-let joinComma = (arr) => arr.join(",");
-let splitByComma = (str) => str.split(",");
-
-export default {
-  name: "FlowEdit",
-  components: {
-    flowNode,
+// 表格状态
+let actionStrategies = {
+  search() {
+    debugger;
+    this.handleFormSubmit();
   },
+  // 查询
+  add() {
+    debugger;
+    let componentProps = {
+      mode: "addUse",
+    };
+    // this.$openDialog(UserAddForm)(componentProps, this)
+    //   .then(() => {
+    //     // 刷新页面
+    //     console.log("刷新页面");
+    //     this.handleFormSubmit();
+    //   })
+    //   .catch(() => {
+    //     console.log("用户取消了");
+    //   });
+  },
+  // 查询
+  editFlow(row) {
+    debugger;
+  },
+  // 人员清册详情
+  viewDetial(row) {
+    this.vis.userBasicInformation = true;
+    this.mode = "AndBasic";
+  },
+
+  // 返回
+  close() {
+    this.$router.push({
+      userGweisehzhi: false,
+      path: "/archives/staff/home",
+    });
+  },
+};
+
+// 查询
+let TableMixin = {
   data() {
     return {
-      jsPlumb: null,
-      currentItem: null,
-      nodeTypeList: nodeTypeList,
-      nodeTypeObj: {},
-
-      isEditMode: false,
-
-      data: {
-        title: "流程名称",
-        nodeList: [],
-        lineList: [],
-      },
-      selectedList: [],
-      jsplumbSetting: jsplumbSetting,
-      jsplumbConnectOptions: jsplumbConnectOptions,
-      jsplumbSourceOptions: jsplumbSourceOptions,
-      jsplumbTargetOptions: jsplumbTargetOptions,
-      auxiliaryLine: { isShowXLine: false, isShowYLine: false }, //对齐辅助线是否显示
-      auxiliaryLinePos: {
-        width: "100%",
-        height: "100%",
-        offsetX: 0,
-        offsetY: 0,
-        x: 20,
-        y: 20,
-      },
-      commonGrid: [5, 5], //节点移动最小距离
-      selectModuleFlag: false, //多选标识
-      rectAngle: {
-        px: "", //多选框绘制时的起始点横坐标
-        py: "", //多选框绘制时的起始点纵坐标
-        left: 0,
-        top: 0,
-        height: 0,
-        width: 0,
-      },
+      isTableLoading: false,
+      tableData: [],
+      // 选择的项
+      multipleSelection: [],
+      tableKey: -1,
     };
   },
 
   methods: {
-    ...methods,
+    handleFormSubmit2(order) {
+      this.pagination.current = 1;
+      this.handleFormSubmit(order);
+    },
+    //查询操作（条件总数据）
+    handleFormSubmit(order) {
+      let q = this.queryParams;
+      let params = {
+        title: q.title || "",
+        page: this.pagination.current,
+        limit: this.pagination.size,
+      };
+      // 获取查询请求
+      this.loadList(params);
+    },
+  },
+};
 
+// 获取请求
+let PaginationMixin = {
+  data() {
+    return {};
+  },
+
+  methods: {
     /**
-     * 初始化节点类型对象
+     * 设置数据总页数
+     * @param {Number} num
      */
-    initNodeTypeObj() {
-      nodeTypeList.map((v) => {
-        this.nodeTypeObj[v.type] = v;
-      });
+    setTotal(num) {
+      this.total = num;
     },
 
-    /**
-     * 初始化节点
-     */
-    initNode() {
-      let nodeList = this.data.nodeList;
-      let nodeItemAdapter = (item) => {
-        item.logImg = this.nodeTypeObj[item.type].logImg;
-        item.log_bg_color = this.nodeTypeObj[item.type].log_bg_color;
-        let setInfoItem = get(item, "setInfoList[0]", shenpiObjFactory());
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
 
-        setInfoItem.user = Array.isArray(setInfoItem.user)
-          ? setInfoItem.user
-          : splitByComma(setInfoItem.user).filter(Boolean);
-        setInfoItem.role = Array.isArray(setInfoItem.role)
-          ? setInfoItem.user
-          : splitByComma(setInfoItem.role).filter(Boolean);
-        item.shenpi = pick(setInfoItem, ["type", "user", "role"]);
+    // 获取请求
+    loadList(apiOptions) {
+      this.isTableLoading = true;
 
-        const KEY_MAP = {
-          zuzhi: "CompanyCode",
-          bumen: "Bumen",
-        };
-
-        let whereStrItemAdapter = (item) => {
-          if (item.T_FieldName === "CompanyCode") {
-            item.T_Val.split("&")
-              .map(($item) => $item.split("="))
-              .forEach(($item) => {
-                let key = KEY_MAP && KEY_MAP[$item[0]];
-                let val = $item[1];
-                item[key] = val;
-                console.log(`key: ${key}, val: ${val}`);
-              });
-            item.T_Val = "";
+      getFLowList(apiOptions)
+        .then((res) => {
+          if (res.code === 200) {
+            this.tableData = res.data || [];
+            this.tableData.map((__item__) => {
+              return (__item__.fileLength = 0);
+            });
+            this.setTotal(res.count);
+            this.isTableLoading = false;
+          } else {
+            this.tableData = [];
+            this.isTableLoading = false;
           }
-          return item;
-        };
-        item.whereStr = (setInfoItem.whereStr || []).map(whereStrItemAdapter);
-        delete item.setInfoList;
-        return item;
+        })
+        .catch((err) => {
+          console.log(err);
+          this.$message.error("请求异常，请重试");
+          this.isTableLoading = false;
+        });
+    },
+  },
+};
+
+/**
+ * 处理查询条件
+ * 更多查询
+ */
+const handleQuery = {
+  data() {
+    return {
+      palestine: [],
+      queryParams: {
+        // 流程名称
+        title: "",
+      },
+
+      isFirstTime: true,
+      dboption: [],
+    };
+  },
+  methods: {
+    /**
+     * 确认条件
+     */
+    confirm() {
+      let yixuanArr = [];
+      let queryParams = this.queryParams;
+      let funert = (rge) => {
+        return rge.Optiopns.find((e) => e.ID === rge.vale).Name;
       };
-      this.data.nodeList = nodeList.map(nodeItemAdapter);
+      let funert1 = (rge) => {
+        return rge.Optiopns.find((e) => e.Name === rge.vale).Name;
+      };
+      Object.keys(queryParams).forEach((key) => {
+        if (queryParams[key].istitle && queryParams[key].vale) {
+          if (queryParams[key].Optiopns) {
+            if (key === "chedui" || key === "yonggong") {
+              yixuanArr.push({
+                vlaeId: queryParams[key].vale,
+                plaholer: queryParams[key].plaholer,
+                vale: funert1(queryParams[key]),
+              });
+            } else {
+              yixuanArr.push({
+                vlaeId: queryParams[key].vale,
+                plaholer: queryParams[key].plaholer,
+                vale: funert(queryParams[key]),
+              });
+            }
+          } else if (
+            Array.isArray(queryParams[key].vale) &&
+            queryParams[key].vale.length
+          ) {
+            yixuanArr.push({
+              vale: queryParams[key].vale[0] + "至" + queryParams[key].vale[1],
+              plaholer: queryParams[key].plaholer,
+            });
+          } else {
+            yixuanArr.push({
+              vale: queryParams[key].vale,
+              plaholer: queryParams[key].plaholer,
+            });
+          }
+        }
+      });
+      this.palestine = yixuanArr;
+      this.$nextTick(() => {
+        this.calcTableAviableHeight();
+      });
+      this.doAction("search");
+      console.log("打印结果this.queryParams", this.palestine);
     },
 
     /**
-     * 保存流程
+     * 清空条件
      */
-    saveFlow() {
-      console.log("SAVE FLOW:::)");
+    reset() {
+      let queryParams = this.queryParams;
+      Object.keys(queryParams).forEach((key) => {
+        if (key !== "zhuangtai") {
+          queryParams[key].vale = "";
+        }
+      });
+      this.palestine = [];
+      this.$nextTick(() => {
+        this.calcTableAviableHeight();
+      });
+      this.doAction("search");
+      console.log("打印结果this.queryParams", this.queryParams);
+    },
 
-      let nodeAdapter = (item) => {
-        let obj = pick(item, ["id", "type", "name", "top", "left"]);
-        let shenpiObj = get(item, "shenpi", {
-          type: "selectByUser",
-          user: [],
-          role: [],
-          NodeName: "",
-          jop: "",
-        });
+    /**
+     * 删除条件
+     */
+    DeletItem(item, index) {
+      this.palestine.splice(index, 1);
+      let queryParams = this.queryParams;
+      Object.keys(queryParams).forEach((key) => {
+        if (queryParams[key].plaholer === item.plaholer)
+          queryParams[key].vale = "";
+      });
+      this.$nextTick(() => {
+        this.calcTableAviableHeight();
+      });
+      this.doAction("search");
+    },
 
-        let setInfoItem = {
-          whereStr: get(item, "whereStr", [])
-            .map(whereStrItemAdapter)
-            .map((item) => {
-              return pick(item, [
-                "flag",
-                "T_FieldName",
-                "T_Operation",
-                "T_Val",
-              ]);
-            }),
-          type: shenpiObj.type,
-          // NOTE:
-          // - 不用区分类型直接对数据进行处理
-          user: joinComma(shenpiObj.user),
-          role: joinComma(shenpiObj.role),
-        };
+    focusOptfun() {
+      if (!this.isFirstTime) {
+        this.queryParams.xingmin.Optiopns = this.dboption;
+      }
+    },
+  },
+};
 
-        obj.setInfoList = [setInfoItem];
-        return obj;
-      };
-      let toBackEndData = {
-        title: this.data.title,
-        nodeList: this.data.nodeList.map(nodeAdapter),
-        lineList: this.data.lineList,
-      };
-      console.log(JSON.stringify(toBackEndData));
+export default {
+  name: "UserTableView",
+
+  mixins: [handleChange, TableMixin, PaginationMixin, handleQuery],
+
+  // 组件列表
+  components: {},
+
+  computed: {
+    isZhuZhi() {
+      // 定义变量hint，初始值为'请选择组织'
+      // 如果queryParams.qiye存在，且QueryList.gangweiOptions的长度为0，则将hint的值改为'暂无部门'
+      // 返回hint的值
+      let hint = "请选择组织";
+      if (
+        this.queryParams.qiye.vale &&
+        !this.queryParams.gangwe.Optiopns.length
+      ) {
+        hint = "暂无部门";
+      }
+      return hint;
     },
   },
 
-  async mounted() {
-    let [err, res] = await this.$to(getFlowDetial("DEBUG-888888"));
-    if (err) {
-      this.$message.error("获取流程异常, 请稍后再试");
-      return;
-    }
+  data() {
+    return {
+      state: "",
+      tableHeight: 0, // 表格高度
+      mode: "",
+      scope: {},
+      scopeId: "",
+      scopeLine: {},
+      vis: {
+        andUsers: false,
+        super: false,
 
-    // res.nodeList.forEach((nodeItem) => {
-    //   nodeItem.setInfoList[0].whereStr = nodeItem.setInfoList[0].whereStr.map(
-    //     (item) => {
-    //       if (item.T_FieldName === "CompanyCode") {
-    //         item.userOptions = [];
-    //         item.roleOptions = [];
+        userBasicInformation: false,
+      },
 
-    //         item.T_Val.split("&")
-    //           .map(($item) => $item.split("="))
-    //           .forEach(($item) => {
-    //             let key = KEY_MAP && KEY_MAP[$item[0]];
-    //             console.log(`key: ${key}`);
-    //             item[key] = $item[1];
-    //           });
-    //       }
-    //       return item;
-    //     }
-    //   );
-    // });
+      // 分页
+      pagination: {
+        current: 1,
+        size: 15,
+      },
+      // 数据总条数
+      total: 0,
+      paginationSizes: [15, 30, 50],
 
-    Object.assign(this.data, res);
-    this.jsPlumb = jsPlumb.getInstance();
-    this.initNodeTypeObj();
-    this.initNode();
-    this.fixNodesPosition();
+      tableNameId: "bf0c796a-b2da-42f4-947f-d22848b56e94",
+    };
+  },
+
+  // 防止表格错位
+  activated() {
+    this.$refs.tables.doLayout();
+  },
+
+  methods: {
+    handleCloses(done) {
+      this.$confirm("确认关闭？")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
+    },
+
+    // 点击当前行事件
+    rowclick(row) {
+      this.$refs.tables.clearSelection();
+      this.$refs.tables.toggleRowSelection(row);
+    },
+
+    // 绑定后台是否升降序
+    sortchange(column) {
+      console.log(column);
+      var fieldName = column.prop;
+      var sortingType = column.order;
+
+      if (sortingType === "descending") {
+        sortingType = "desc";
+      } //按照升序排序
+      else {
+        sortingType = "asc";
+      }
+      let co = "a." + fieldName + " " + sortingType;
+      console.log(co);
+      this.handleFormSubmit(co);
+    },
+
+    /**
+     * 处理分页器页面数据大小变化
+     */
+    handleSizeChange(size) {
+      let pagination = this.getPaginationState();
+      pagination.current = 1;
+      pagination.size = size;
+      this.handleFormSubmit();
+    },
+
+    /**
+     * 处理分页器页面数变化
+     */
+    handleCurrentChange(current) {
+      let pagination = this.getPaginationState();
+      pagination.current = current;
+      this.handleFormSubmit();
+    },
+
+    /**
+     * 列表接口适配器
+     */
+    getPaginationState() {
+      return this.pagination;
+    },
+
+    doAction(actionType, row = {}) {
+      console.log(`动作类型: `, actionType);
+      let func = actionStrategies && actionStrategies[actionType];
+      func && func.call(this, row);
+    },
+
+    // 窗口关闭返回刷新
+    refresh() {
+      this.handleFormSubmit();
+    },
+
+    /**
+     * 计算表格可用高度
+     */
+    calcTableAviableHeight() {
+      let el = this.$refs.table;
+      if (el && el.getBoundingClientRect) {
+        let { top } = el.getBoundingClientRect();
+        let h = 50 + 15 + 27 + top;
+        let tableHeight = window.innerHeight - h - 33;
+        // 设置table的高度
+        el.style.height = tableHeight + "px";
+        this.tableHeight = tableHeight;
+      }
+    },
+
+    // 获取下拉
+    async getSelect() {
+      let listOptions = [
+        {
+          dicTypeID: "-1",
+          dicTypeName: " 所属组织",
+          key: "qiye.Optiopns",
+        },
+        {
+          dicTypeID: "b5cab1b3-e486-4ae6-9d95-a849a710d72f",
+          dicTypeName: "人员下拉",
+          key: "xingmin.Optiopns",
+        },
+        {
+          dicTypeID: "f305ce37-887a-44fb-a292-4739a17d56ba",
+          dicTypeName: "岗位",
+          key: "gangwe.Optiopns",
+        },
+        {
+          dicTypeID: "52ed19dd-38f3-4cd4-b593-1a3e75098120",
+          dicTypeName: " 角色",
+          key: "juese.Optiopns",
+        },
+        {
+          dicTypeID: "ec44bf96-ee73-4610-9c4c-0e0e4322ea21",
+          dicTypeName: " 在职状态",
+          key: "zhuangtai.Optiopns",
+        },
+      ];
+
+      await this.$getOptions.call(this, listOptions, "queryParams");
+
+      await getChedui()
+        .then((response) => {
+          this.queryParams.chedui.Optiopns = response.data;
+        })
+        .catch((err) => {});
+
+      this.handleFormSubmit();
+    },
+  },
+
+  mounted() {
+    let $__func = this.debounceHandleResize.bind(this);
+    window.addEventListener("resize", $__func);
+
     this.$nextTick(() => {
-      this.init();
+      this.calcTableAviableHeight();
     });
+  },
+
+  created() {
+    let { token } = this.$route.query;
+    token && setToken(token);
+
+    this.getSelect();
+    this.debounceHandleResize = debounce(
+      250,
+      this.calcTableAviableHeight.bind(this)
+    );
   },
 };
 </script>
 
 <style lang="less" scoped>
-.flow_region {
-  &--header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 2;
-    height: 50px;
-    background: aliceblue;
-    font-size: 1.5em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-left: 35px;
-    padding-right: 35px;
-
-    input {
-      width: 200px;
-      appearance: none;
-      border: none;
-      border-bottom: 1px solid #d2d2d2;
-      background: transparent;
-      padding: 3px 10px;
-      text-align: center;
-      margin-top: 5px;
-      height: 32px;
-    }
+// =========================== 更多查询-Start ===========================
+.chaxunspan {
+  background-color: rgba(60, 156, 255, 0.24);
+  padding: 2px 5px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 3px 5px;
+  &_icn {
+    color: rgba(166, 166, 166, 1);
+    margin-left: 5px;
   }
-
+}
+::v-deep.seleinput {
+  width: 245px !important;
+  margin: 3px;
+  & .el-range-separator {
+    width: 10%;
+    padding: 0;
+  }
+}
+.cpopover {
   display: flex;
-  height: 100%;
-  padding-top: 50px;
-  border: 1px solid #ccc;
-  .nodes-wrap {
-    width: 150px;
-    height: 100%;
-    border-right: 1px solid #ccc;
-    .node {
-      display: flex;
-      height: 40px;
-      width: 80%;
-      margin: 5px auto;
-      border: 1px solid #ccc;
-      line-height: 40px;
-      &:hover {
-        cursor: grab;
-      }
-      &:active {
-        cursor: grabbing;
-      }
-      .log {
-        width: 40px;
-        height: 40px;
-      }
-      .name {
-        width: 0;
-        flex-grow: 1;
-      }
-    }
-  }
-  .flow-wrap {
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-    outline: none !important;
-    flex-grow: 1;
-    background-image: url("../flowDesignResource/point.png");
-    #flow {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      .auxiliary-line-x {
-        position: absolute;
-        border: 0.5px dashed #2ab1e8;
-        z-index: 9999;
-      }
-      .auxiliary-line-y {
-        position: absolute;
-        border: 0.5px dashed #2ab1e8;
-        z-index: 9999;
-      }
-    }
+  flex-direction: column;
+  align-items: center;
+  p {
+    align-self: end;
   }
 }
-</style>
+// =========================== 更多查询-End ===========================
 
-<style lang="less">
-.jtk-connector.active {
-  z-index: 9999;
-  path {
-    stroke: #150042;
-    stroke-width: 1.5;
-    animation: ring;
-    animation-duration: 3s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    stroke-dasharray: 5;
+.table-action {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 10px;
+
+  > * {
+    margin-right: 10px;
   }
 }
-@keyframes ring {
-  from {
-    stroke-dashoffset: 50;
+
+// 加载状态居中
+::v-deep .el-loading-spinner {
+  display: flex;
+  justify-content: center;
+}
+
+.custom--table {
+  ::v-deep tr.current-row > td.el-table__cell {
+    color: #fff;
+    background-color: #0482b0 !important;
   }
-  to {
-    stroke-dashoffset: 0;
+}
+
+.max-x-200 {
+  max-width: 200px;
+}
+
+.summary-bar {
+  span {
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #1890ff;
+  }
+}
+
+// 弹窗表头/关闭
+::v-deep .el-dialog__header {
+  background: rgb(204, 204, 204);
+
+  & .el-dialog__headerbtn {
+    position: absolute;
+    top: 8px;
+    right: 20px;
+    padding: 0;
+    background: 0 0;
+    border: none;
+    outline: 0;
+    cursor: pointer;
+    font-size: 30px;
+    font-weight: 400;
   }
 }
 </style>
