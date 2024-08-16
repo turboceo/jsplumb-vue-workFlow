@@ -391,6 +391,85 @@ export default {
     let isAddMode = mode === "add";
     this.isAddMode = isAddMode;
 
+    if (isAddMode) {
+      // TODO:
+      // 设置默认的节点、连线
+      Object.assign(this.data, {
+        nodeList: [
+          {
+            id: "58hcvdsbpgs000",
+            type: "start",
+            name: "开始",
+            top: "180px",
+            left: "180px",
+            setInfoList: [
+              {
+                whereStr: [
+                  {
+                    T_Operation: "",
+                    T_Val: "",
+                  },
+                ],
+                type: "selectByUser",
+                user: "",
+                role: "",
+              },
+            ],
+          },
+          {
+            id: "4g8p1kpr9wq000",
+            type: "node",
+            name: "审批节点",
+            top: "180px",
+            left: "420px",
+            setInfoList: [
+              {
+                whereStr: [
+                  {
+                    T_Operation: "",
+                    T_Val: "",
+                  },
+                ],
+                type: "selectByUser",
+                user: "",
+                role: "",
+              },
+            ],
+          },
+          {
+            id: "4dly1u357je000",
+            type: "end",
+            name: "结束",
+            top: "180px",
+            left: "695px",
+            setInfoList: [
+              {
+                whereStr: [
+                  {
+                    T_Operation: "",
+                    T_Val: "",
+                  },
+                ],
+                type: "selectByUser",
+                user: "",
+                role: "",
+              },
+            ],
+          },
+        ],
+        lineList: [
+          {
+            from: "58hcvdsbpgs000",
+            to: "4g8p1kpr9wq000",
+            label: "连线名称",
+            id: "8mphpw7u5oc00",
+            Remark: "",
+          },
+        ],
+      });
+      this.data;
+    }
+
     if (mode === "edit") {
       let [err, res] = await this.$to(getFlowDetial(id));
       if (err) {
