@@ -14,9 +14,9 @@
       ></el-input>
     </el-form-item>
 
-    <el-form-item label="流程类型" prop="FrmType" required>
+    <el-form-item label="流程类型" prop="FrmId" required>
       <el-select
-        v-model="ruleForm.FrmType"
+        v-model="ruleForm.FrmId"
         placeholder="请选择流程类型"
         style="width: 100%"
       >
@@ -104,7 +104,7 @@ let ruleFormFactory = () => {
     // 流程名称
     SchemeName: "",
     // 流程类型
-    FrmType: "",
+    FrmId: "",
     whereStr: [],
     // whereStr: [whereStrFactory()],
   };
@@ -147,7 +147,7 @@ export default {
           { required: true, message: "请输入流程名称", trigger: "blur" },
           { min: 3, message: "长度至少 3 个字符", trigger: "blur" },
         ],
-        FrmType: [
+        FrmId: [
           { required: true, message: "请选择流程类型", trigger: "change" },
         ],
       },

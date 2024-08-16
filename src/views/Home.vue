@@ -25,7 +25,7 @@
       </el-input>
 
       <el-select
-        v-model="queryParams.FrmType"
+        v-model="queryParams.FrmId"
         size="mini"
         placeholder="请选择流程类型"
       >
@@ -376,7 +376,7 @@ const queryParamsFactory = () => {
     // 流程名称
     title: "",
     createUserName: "",
-    FrmType: "",
+    FrmId: "",
   };
 };
 

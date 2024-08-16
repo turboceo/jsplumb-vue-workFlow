@@ -97,11 +97,11 @@ const OptionMixin = {
         // // 流程名称
         // SchemeName: "",
         // // 流程类型
-        // FrmType: "",
+        // FrmId: "",
         // whereStr: [],
 
         SchemeName: "dafdafda",
-        FrmType: "flowschemeType_qingjia",
+        FrmId: "flowschemeType_qingjia",
         whereStr: [
           {
             CompanyCode: "D01D001",
@@ -263,7 +263,7 @@ export default {
       let toBackEndData = {
         id: "",
         SchemeName: this.flowBaseInfo.SchemeName,
-        FrmType: this.flowBaseInfo.FrmType,
+        FrmId: this.flowBaseInfo.FrmId,
         SchemeCanUser: toJSON(this.flowBaseInfo.whereStr),
         SchemeContent: toJSON({
           nodeList: this.data.nodeList.map(nodeAdapter),
