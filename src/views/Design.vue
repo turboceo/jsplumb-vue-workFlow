@@ -322,6 +322,7 @@ export default {
       this.fixNodesPosition();
       this.$nextTick(() => {
         this.init();
+        this.showCreateFlowDialog();
       });
     },
 
@@ -382,14 +383,10 @@ export default {
     this.getPageOptions();
     let { mode, token } = this.$route.query;
 
-    if (mode === "add") {
-      this.$nextTick(() => {
-        this.showCreateFlowDialog();
-      });
-      return;
-    }
+    let isAddMode = mode === "add";
+    this.isAddMode = isAddMode;
 
-    if (mode === "edit") {
+    if (!isAddMode) {
       let [err, res] = await this.$to(getFlowDetial("DEBUG-888888"));
       if (err) {
         this.$message.error("获取流程异常, 请稍后再试");
