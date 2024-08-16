@@ -113,6 +113,7 @@ export default {
 
       let nodeItemConfigDialogMethods = {
         done: function (event) {
+          debugger;
           Object.assign(node, event);
           // 设置节点名称
           this.$emit("setNodeName", node.id, node.name);

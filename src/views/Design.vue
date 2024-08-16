@@ -101,7 +101,7 @@ const OptionMixin = {
       flowBaseInfo: {
         id: "",
         // 流程名称
-        SchemeName: "",
+        SchemeName: "默认流程名称",
         // 流程类型
         FrmId: "",
         whereStr: [],

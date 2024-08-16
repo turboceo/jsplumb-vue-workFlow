@@ -25,7 +25,7 @@
 
         <template v-if="ruleForm.shenpi.type === 'selectByUser'">
           <el-select
-            v-model="ruleForm.user"
+            v-model="ruleForm.shenpi.user"
             placeholder="请选择"
             style="width: 100%"
             multiple
