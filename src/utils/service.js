@@ -12,7 +12,7 @@ export let getFLowList = (data) => {
 }
 
 export let saveFlow = (data) => {
-    let url = "/FlowSchemes/addFlow"
+    let url = "/FlowSchemes/AddFlow"
     var config = {
         method: "post",
         data,

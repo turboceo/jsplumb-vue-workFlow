@@ -261,6 +261,7 @@ export default {
 
       let toJSON = (obj) => JSON.stringify(obj);
       let toBackEndData = {
+        id: "",
         SchemeName: this.flowBaseInfo.SchemeName,
         FrmType: this.flowBaseInfo.FrmType,
         SchemeCanUser: toJSON(this.flowBaseInfo.whereStr),
