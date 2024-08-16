@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { ajax } from "@/util/index"
 
-export let getFLowList = (data) => {
+export let getFlowList = (data) => {
     let url = "/FlowSchemes/getFlowList"
     var config = {
         method: "post",

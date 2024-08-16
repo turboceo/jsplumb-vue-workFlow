@@ -23,6 +23,44 @@
         placeholder="请输入流程名称"
       >
       </el-input>
+
+      <el-select
+        v-model="queryParams.FrmType"
+        size="mini"
+        placeholder="请选择流程类型"
+      >
+        <el-option
+          v-for="item in pageOptions.flowschemeTypeOptions"
+          :key="item.ID"
+          :label="item.Name"
+          :value="item.ID"
+        ></el-option>
+      </el-select>
+
+      <el-select
+        v-model="queryParams.createUserName"
+        placeholder="请选择创建人"
+        size="mini"
+        clearable
+        filterable
+      >
+        <el-option
+          v-for="item in pageOptions.userOptions"
+          :key="item.ID"
+          :label="item.Name"
+          :value="item.ID"
+        ></el-option>
+      </el-select>
+
+      <el-button
+        size="mini"
+        @click="doAction('search')"
+        class="u-m-l-10"
+        type="warning"
+        style="color: #fefefe"
+        >重置</el-button
+      >
+
       <el-button
         size="mini"
         @click="doAction('search')"
@@ -66,10 +104,39 @@
         <el-table-column prop="schemeName" label="流程名称" align="center">
         </el-table-column>
 
-        <el-table-column prop="createUserName" label="创建人" align="center">
+        <el-table-column
+          prop="createUserName"
+          label="创建人"
+          align="center"
+          width="140"
+        >
         </el-table-column>
 
-        <el-table-column fixed="right" label="操作" width="100" align="center">
+        <el-table-column
+          prop="createDate"
+          label="创建时间"
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+
+        <el-table-column
+          prop="modifyUserName"
+          label="修改人"
+          align="center"
+          width="140"
+        >
+        </el-table-column>
+
+        <el-table-column
+          prop="modifyDate"
+          label="修改时间"
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+
+        <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button
               @click="doAction('viewDetial', scope.row.ID)"
@@ -118,21 +185,19 @@
 </template>
 
 <script>
-import { getFLowList, loadClearList, getChedui } from "@/utils/service";
-import { throttle, debounce } from "throttle-debounce";
+import { getFlowList, getChedui } from "@/utils/service";
+import { debounce } from "throttle-debounce";
 import { setToken } from "@/util/index";
-
-// change事件处理
-const handleChange = {
-  methods: {},
-};
 
 // 表格状态
 let actionStrategies = {
   search() {
     this.handleFormSubmit();
   },
-  // 查询
+
+  /**
+   * 新增流程
+   */
   add() {
     this.$router.push({
       name: "FlowDesign",
@@ -141,7 +206,11 @@ let actionStrategies = {
       },
     });
   },
-  // 查询
+
+  /**
+   * 编辑流程
+   * @param row 当前行对象
+   */
   editFlow(row) {
     this.$router.push({
       name: "FlowDesign",
@@ -151,18 +220,75 @@ let actionStrategies = {
       },
     });
   },
-  // 人员清册详情
+
+  /**
+   * 查看流程详情
+   * @param row 当前行对象
+   */
   viewDetial(row) {
-    this.vis.userBasicInformation = true;
-    this.mode = "AndBasic";
+    this.$router.push({
+      name: "FlowDesign",
+      query: {
+        mode: "view",
+        id: row.id,
+      },
+    });
+  },
+};
+
+const PageOptionsMixin = {
+  data() {
+    return {
+      pageOptions: {
+        companyCodeOptiopns: [],
+        flowschemeTypeOptions: [],
+        liuchengtiaojianleixingOptions: [],
+        userOptions: [],
+        roleOptions: [],
+      },
+    };
   },
 
-  // 返回
-  close() {
-    this.$router.push({
-      userGweisehzhi: false,
-      path: "/archives/staff/home",
-    });
+  methods: {
+    /**
+     * 获取页面下拉项
+     */
+    async getPageOptions() {
+      //         所属组织下拉ID: -1
+      // 流程类型下拉ID：flowschemeType
+      // 流程条件类型（自定义） 下拉ID:  liuchengtiaojianleixing
+      // 用户下拉ID：b5cab1b3-e486-4ae6-9d95-a849a710d72f
+      // 角色下拉ID：a97a2af4-edfb-4dcd-b606-25a21bbd9fda
+      // dicTypeID: "-1,flowschemeType,liuchengtiaojianleixing,b5cab1b3-e486-4ae6-9d95-a849a710d72f,a97a2af4-edfb-4dcd-b606-25a21bbd9fda",
+      let listOptions = [
+        {
+          dicTypeID: "-1",
+          dicTypeName: "所属组织",
+          key: "pageOptions.companyCodeOptiopns",
+        },
+        {
+          dicTypeID: "flowschemeType",
+          dicTypeName: "流程类型下拉ID",
+          key: "pageOptions.flowschemeTypeOptions",
+        },
+        // {
+        //   dicTypeID: "liuchengtiaojianleixing",
+        //   dicTypeName: "流程条件类型（自定义） 下拉ID",
+        //   key: "pageOptions.liuchengtiaojianleixingOptions",
+        // },
+        {
+          dicTypeID: "b5cab1b3-e486-4ae6-9d95-a849a710d72f",
+          dicTypeName: "用户下拉ID",
+          key: "pageOptions.userOptions",
+        },
+        // {
+        //   dicTypeID: "a97a2af4-edfb-4dcd-b606-25a21bbd9fda",
+        //   dicTypeName: "角色下拉ID",
+        //   key: "pageOptions.roleOptions",
+        // },
+      ];
+      await this.$getOptions.call(this, listOptions, true);
+    },
   },
 };
 
@@ -183,13 +309,16 @@ let TableMixin = {
       this.pagination.current = 1;
       this.handleFormSubmit(order);
     },
-    //查询操作（条件总数据）
+
+    /**
+     * 查询操作（条件总数据）
+     * @param order
+     */
     handleFormSubmit(order) {
-      let q = this.queryParams;
       let params = {
-        title: q.title || "",
         page: this.pagination.current,
         limit: this.pagination.size,
+        ...this.queryParams,
       };
       // 获取查询请求
       this.loadList(params);
@@ -219,8 +348,7 @@ let PaginationMixin = {
     // 获取请求
     loadList(apiOptions) {
       this.isTableLoading = true;
-
-      getFLowList(apiOptions)
+      getFlowList(apiOptions)
         .then((res) => {
           if (res.code === 200) {
             this.tableData = res.data || [];
@@ -243,92 +371,35 @@ let PaginationMixin = {
   },
 };
 
+const queryParamsFactory = () => {
+  return {
+    // 流程名称
+    title: "",
+    createUserName: "",
+    FrmType: "",
+  };
+};
+
 /**
  * 处理查询条件
  * 更多查询
  */
-const handleQuery = {
+const HandleQueryMixin = {
   data() {
     return {
-      palestine: [],
-      queryParams: {
-        // 流程名称
-        title: "",
-      },
-
-      isFirstTime: true,
-      dboption: [],
+      queryParams: queryParamsFactory(),
     };
   },
   methods: {
     /**
-     * 确认条件
-     */
-    confirm() {
-      let yixuanArr = [];
-      let queryParams = this.queryParams;
-      let funert = (rge) => {
-        return rge.Optiopns.find((e) => e.ID === rge.vale).Name;
-      };
-      let funert1 = (rge) => {
-        return rge.Optiopns.find((e) => e.Name === rge.vale).Name;
-      };
-      Object.keys(queryParams).forEach((key) => {
-        if (queryParams[key].istitle && queryParams[key].vale) {
-          if (queryParams[key].Optiopns) {
-            if (key === "chedui" || key === "yonggong") {
-              yixuanArr.push({
-                vlaeId: queryParams[key].vale,
-                plaholer: queryParams[key].plaholer,
-                vale: funert1(queryParams[key]),
-              });
-            } else {
-              yixuanArr.push({
-                vlaeId: queryParams[key].vale,
-                plaholer: queryParams[key].plaholer,
-                vale: funert(queryParams[key]),
-              });
-            }
-          } else if (
-            Array.isArray(queryParams[key].vale) &&
-            queryParams[key].vale.length
-          ) {
-            yixuanArr.push({
-              vale: queryParams[key].vale[0] + "至" + queryParams[key].vale[1],
-              plaholer: queryParams[key].plaholer,
-            });
-          } else {
-            yixuanArr.push({
-              vale: queryParams[key].vale,
-              plaholer: queryParams[key].plaholer,
-            });
-          }
-        }
-      });
-      this.palestine = yixuanArr;
-      this.$nextTick(() => {
-        this.calcTableAviableHeight();
-      });
-      this.doAction("search");
-      console.log("打印结果this.queryParams", this.palestine);
-    },
-
-    /**
      * 清空条件
      */
     reset() {
-      let queryParams = this.queryParams;
-      Object.keys(queryParams).forEach((key) => {
-        if (key !== "zhuangtai") {
-          queryParams[key].vale = "";
-        }
-      });
-      this.palestine = [];
+      Object.assign(this.queryParams, queryParamsFactory());
       this.$nextTick(() => {
         this.calcTableAviableHeight();
       });
       this.doAction("search");
-      console.log("打印结果this.queryParams", this.queryParams);
     },
 
     /**
@@ -356,9 +427,9 @@ const handleQuery = {
 };
 
 export default {
-  name: "UserTableView",
+  name: "PageHome",
 
-  mixins: [handleChange, TableMixin, PaginationMixin, handleQuery],
+  mixins: [TableMixin, PaginationMixin, HandleQueryMixin, PageOptionsMixin],
 
   // 组件列表
   components: {},
@@ -495,67 +566,28 @@ export default {
         this.tableHeight = tableHeight;
       }
     },
-
-    // 获取下拉
-    async getSelect() {
-      let listOptions = [
-        {
-          dicTypeID: "-1",
-          dicTypeName: " 所属组织",
-          key: "qiye.Optiopns",
-        },
-        {
-          dicTypeID: "b5cab1b3-e486-4ae6-9d95-a849a710d72f",
-          dicTypeName: "人员下拉",
-          key: "xingmin.Optiopns",
-        },
-        {
-          dicTypeID: "f305ce37-887a-44fb-a292-4739a17d56ba",
-          dicTypeName: "岗位",
-          key: "gangwe.Optiopns",
-        },
-        {
-          dicTypeID: "52ed19dd-38f3-4cd4-b593-1a3e75098120",
-          dicTypeName: " 角色",
-          key: "juese.Optiopns",
-        },
-        {
-          dicTypeID: "ec44bf96-ee73-4610-9c4c-0e0e4322ea21",
-          dicTypeName: " 在职状态",
-          key: "zhuangtai.Optiopns",
-        },
-      ];
-
-      await this.$getOptions.call(this, listOptions, "queryParams");
-
-      await getChedui()
-        .then((response) => {
-          this.queryParams.chedui.Optiopns = response.data;
-        })
-        .catch((err) => {});
-
-      this.handleFormSubmit();
-    },
-  },
-
-  mounted() {
-    let $__func = this.debounceHandleResize.bind(this);
-    window.addEventListener("resize", $__func);
-
-    this.$nextTick(() => {
-      this.calcTableAviableHeight();
-    });
   },
 
   created() {
+    // 设置页面Token
     let { token } = this.$route.query;
     token && setToken(token);
-
-    this.getSelect();
+    this.getPageOptions();
+    this.handleFormSubmit();
     this.debounceHandleResize = debounce(
       250,
       this.calcTableAviableHeight.bind(this)
     );
+    this.$on("hook:mounted", () => {
+      let $__func = this.debounceHandleResize.bind(this);
+      window.addEventListener("resize", $__func);
+      this.$nextTick(() => {
+        this.calcTableAviableHeight();
+      });
+    });
+    this.$on("hook:destoryed", () => {
+      window.removeEventListener("resize");
+    });
   },
 };
 </script>
