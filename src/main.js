@@ -2,8 +2,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import Contextmenu from 'vue-contextmenujs'
-// import ViewUI from 'view-design';
-// import 'view-design/dist/styles/iview.css';
 import '@/style/index.less'
 
 import ElementUI from 'element-ui';
@@ -17,7 +15,7 @@ Vue.config.productionTip = false
 Vue.prototype.$to = $to
 
 Vue.use(Contextmenu);
-// Vue.use(ViewUI);
+
 new Vue({
   router,
   render: h => h(App)

@@ -12,11 +12,11 @@ module.exports = {
     config.resolve.alias.set('@', resolve('src'))
     mix(config, {
       externals: {
-        vue: "Vue",
-        "element-ui": "ELEMENT",
-        "vue-router": "VueRouter",
-        axios: "axios",
-        vuex: "Vuex",
+        // vue: "Vue",
+        // "vue-router": "VueRouter",
+        // axios: "axios",
+        // vuex: "Vuex",
+        // "element-ui": "ELEMENT",
       },
       cache: {
         // 使用文件缓存，加速二次构建
