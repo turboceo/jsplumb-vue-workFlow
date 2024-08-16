@@ -17,6 +17,7 @@
           v-model="ruleForm.shenpi.type"
           placeholder="请选择"
           style="flex: 0 0 250px"
+          @change="(e) => handleItemFlagChange(e)"
         >
           <el-option label="按用户审批" value="selectByUser"></el-option>
           <el-option label="按角色审批" value="selectByRole"></el-option>
@@ -51,9 +52,9 @@
           >
             <el-option
               v-for="item in pageOptions.roleOptions"
-              :key="item.ID"
+              :key="item.Id"
               :label="item.Name"
-              :value="item.ID"
+              :value="item.Id"
             ></el-option>
           </el-select>
         </template>
@@ -67,13 +68,18 @@
         :key="index"
       >
         <el-select
-          v-model="item.flag"
+          v-model="item.T_FieldName"
           placeholder="请选择"
-          style="flex: 0 0 150px"
-          @change="(flag) => handleItemFlagChange(item, flag)"
+          style="flex: 0 0 100px"
+          clearable
+          filterable
         >
-          <el-option label="消费金额" value="C01"></el-option>
-          <el-option label="发票额" value="C02"></el-option>
+          <el-option
+            v-for="item in pageOptions.flowschemeTypeOptions"
+            :key="item.ID"
+            :label="item.Name"
+            :value="item.ID"
+          ></el-option>
         </el-select>
 
         <el-select
@@ -178,18 +184,8 @@ export default {
   },
   methods: {
     handleItemFlagChange(item, flag) {
-      // 重置
-      item.T_FieldName = "";
-      let strategy = fetchListStrategies && fetchListStrategies[flag];
-      if (!strategy) return;
-      strategy && strategy.call(this, item);
-    },
-
-    handleItemCompanyCodeChange(item, CompanyCode) {
-      if (!CompanyCode) return;
-      let strategy = fetchListStrategies && fetchListStrategies["bumen"];
-      if (!strategy) return;
-      strategy && strategy.call(this, item);
+      this.ruleForm.shenpi.user = [];
+      this.ruleForm.shenpi.role = [];
     },
 
     /**
@@ -220,22 +216,9 @@ export default {
     let f = this.ruleForm;
     let node = this.node;
 
-    // 遍历每一项判断是否需要调用接口
+    // TODO:
+    // -REMOVE
     node.whereStr = node.whereStr.map((item) => {
-      if (item.T_FieldName !== "CompanyCode") return item;
-      console.log(item.CompanyCode, item.Bumen);
-      // 判断组织&部门是否有值
-      // 部门需要联动组织进行查询
-      if (item.CompanyCode) {
-        fetchListStrategies.CompanyCode.call(this, item).then(() => {
-          this.$forceUpdate();
-        });
-        fetchListStrategies.bumen
-          .call(this, item, item.CompanyCode)
-          .then(() => {
-            this.$forceUpdate();
-          });
-      }
       return item;
     });
 
