@@ -312,6 +312,7 @@ export default {
         },
       ];
       await this.$getOptions.call(this, listOptions, true);
+      this.$store.commit("updatePageOptions", this.pageOptions);
     },
 
     renderFlow() {

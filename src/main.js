@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import Contextmenu from 'vue-contextmenujs'
 import '@/style/index.less'
 
@@ -60,5 +61,6 @@ Vue.prototype.$hasPerm = $hasPerm
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

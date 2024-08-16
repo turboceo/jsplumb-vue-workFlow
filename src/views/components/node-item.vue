@@ -151,6 +151,7 @@ export default {
           key: nodeId,
           props: {
             node,
+            pageOptions: this.$store.state.pageOptions,
           },
           on: {
             ...nodeItemConfigDialogMethods,
@@ -162,8 +163,6 @@ export default {
       this.$emit("deleteNode", this.node);
     },
   },
-
-  created() {},
 };
 </script>
 
