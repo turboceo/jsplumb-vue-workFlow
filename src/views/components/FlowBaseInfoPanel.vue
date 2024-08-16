@@ -40,7 +40,8 @@
           placeholder="请选择"
           style="flex: 0 0 200px"
           @change="
-            (CompanyCode) => handleItemCompanyCodeChange(item, CompanyCode)
+            (CompanyCode) =>
+              handleItemCompanyCodeChange(item, CompanyCode, true)
           "
         >
           <el-option
@@ -154,7 +155,15 @@ export default {
     };
   },
   methods: {
-    async handleItemCompanyCodeChange(item, companyCode) {
+    async handleItemCompanyCodeChange(
+      item,
+      companyCode,
+      shouldResetData = false
+    ) {
+      if (shouldResetData) {
+        this.CompanyCode = [];
+        item.Bumen = [];
+      }
       let res = await getChildDeptList(companyCode);
       if (res.code !== 200) return;
       // 调整部门下拉列表

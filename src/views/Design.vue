@@ -1,11 +1,14 @@
 <template>
   <div class="flow_region">
     <!-- Header -->
-    <div class="flow_region--header">
-      <div class="flow_region--header---input">
+    <div class="u-flex flow_region--header">
+      <div class="u-flex-1 text-ellipsis flow_region--header---input">
         {{ flowBaseInfo.SchemeName }}
       </div>
       <div class="flow_region--header---action">
+        <el-button type="primary" @click="showCreateFlowDialog" plain
+          >配置流程基本信息</el-button
+        >
         <el-button type="primary" @click="saveFlow">保存流程</el-button>
       </div>
     </div>
@@ -407,7 +410,7 @@ export default {
       let mix = Object.assign;
       let parseJSON = (str) => JSON.parse(str);
       let obj$1 = pick(res, ["id", "SchemeName", "FrmId"]);
-      obj$1.whereStr = parseJSON(res.SchemeContent);
+      obj$1.whereStr = parseJSON(res.SchemeCanUser);
       mix(this.flowBaseInfo, obj$1);
       mix(this.data, parseJSON(res.SchemeContent));
     }
@@ -418,6 +421,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .flow_region {
   &--header {
     position: fixed;
@@ -425,7 +433,7 @@ export default {
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;
-    width: 500px;
+    width: 600px;
     height: 70px;
     background: #409eff73;
     border-radius: 0 0 10px 10px;
