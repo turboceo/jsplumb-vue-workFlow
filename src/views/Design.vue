@@ -208,26 +208,14 @@ export default {
           : splitByComma(setInfoItem.role).filter(Boolean);
         item.shenpi = pick(setInfoItem, ["type", "user", "role"]);
 
+        debugger;
+
         const KEY_MAP = {
           zuzhi: "CompanyCode",
           bumen: "Bumen",
         };
 
-        let whereStrItemAdapter = (item) => {
-          if (item.T_FieldName === "CompanyCode") {
-            item.T_Val.split("&")
-              .map(($item) => $item.split("="))
-              .forEach(($item) => {
-                let key = KEY_MAP && KEY_MAP[$item[0]];
-                let val = $item[1];
-                item[key] = val;
-                console.log(`key: ${key}, val: ${val}`);
-              });
-            item.T_Val = "";
-          }
-          return item;
-        };
-        item.whereStr = (setInfoItem.whereStr || []).map(whereStrItemAdapter);
+        item.whereStr = setInfoItem.whereStr || [];
         delete item.setInfoList;
         return item;
       };
@@ -239,7 +227,6 @@ export default {
      */
     saveFlow() {
       console.log("SAVE FLOW:::)");
-
       let nodeAdapter = (item) => {
         let obj = pick(item, ["id", "type", "name", "top", "left"]);
         let shenpiObj = get(item, "shenpi", {
@@ -254,6 +241,7 @@ export default {
           whereStr: get(item, "whereStr", [])
             .map(whereStrItemAdapter)
             .map((item) => {
+              debugger;
               return pick(item, ["T_FieldName", "T_Operation", "T_Val"]);
             }),
           type: shenpiObj.type,
@@ -281,10 +269,13 @@ export default {
       };
 
       console.log(JSON.stringify(toBackEndData, null, 4));
-      saveFlow(toBackEndData).then((res) => {
-        console.log(res);
-        this.$message.success("保存成功");
-      });
+
+      // TODO:
+      // -remove commnet
+      // saveFlow(toBackEndData).then((res) => {
+      //   console.log(res);
+      //   this.$message.success("保存成功");
+      // });
     },
 
     /**
