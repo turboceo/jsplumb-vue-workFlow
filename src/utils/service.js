@@ -11,6 +11,15 @@ export let getFLowList = (data) => {
     return ajax(config)
 }
 
+export let saveFlow = (data) => {
+    let url = "/FlowSchemes/addFlow"
+    var config = {
+        method: "post",
+        data,
+        url,
+    }
+    return ajax(config)
+}
 
 /**
  * 获取子部门列表

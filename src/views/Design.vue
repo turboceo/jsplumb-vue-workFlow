@@ -79,6 +79,7 @@ import methods from "./config/methods";
 import flowNode from "./components/node-item";
 
 import { getFlowDetial } from "./components/api";
+import { saveFlow } from "@/utils/service";
 
 import get from "lodash/get";
 import pick from "lodash/pick";
@@ -245,12 +246,7 @@ export default {
           whereStr: get(item, "whereStr", [])
             .map(whereStrItemAdapter)
             .map((item) => {
-              return pick(item, [
-                "flag",
-                "T_FieldName",
-                "T_Operation",
-                "T_Val",
-              ]);
+              return pick(item, ["T_FieldName", "T_Operation", "T_Val"]);
             }),
           type: shenpiObj.type,
           // NOTE:
@@ -262,12 +258,24 @@ export default {
         obj.setInfoList = [setInfoItem];
         return obj;
       };
+
+      let toJSON = (obj) => JSON.stringify(obj);
       let toBackEndData = {
-        title: this.data.title,
-        nodeList: this.data.nodeList.map(nodeAdapter),
-        lineList: this.data.lineList,
+        SchemeName: this.flowBaseInfo.SchemeName,
+        FrmType: this.flowBaseInfo.FrmType,
+        SchemeCanUser: toJSON(this.flowBaseInfo.whereStr),
+        SchemeContent: toJSON({
+          nodeList: this.data.nodeList.map(nodeAdapter),
+          lineList: this.data.lineList,
+        }),
+        Disabled: "0",
       };
-      console.log(JSON.stringify(toBackEndData));
+
+      console.log(JSON.stringify(toBackEndData, null, 4));
+      saveFlow(toBackEndData).then((res) => {
+        console.log(res);
+        this.$message.success("保存成功");
+      });
     },
 
     /**
