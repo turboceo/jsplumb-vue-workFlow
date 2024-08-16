@@ -3,16 +3,7 @@
     <!-- Header -->
     <div class="flow_region--header">
       <div class="flow_region--header---input">
-        <input
-          v-model="data.title"
-          placeholder="请输入流程名称"
-          :disabled="!isEditMode"
-        />
-        <i
-          class="el-icon-edit"
-          style="cursor: pointer; margin-left: 5px"
-          @click="isEditMode = !isEditMode"
-        ></i>
+        {{ data.title }}
       </div>
       <div class="flow_region--header---action">
         <el-button type="primary" @click="saveFlow">保存流程</el-button>
@@ -97,8 +88,47 @@ import { shenpiObjFactory } from "./components/factory";
 let joinComma = (arr) => arr.join(",");
 let splitByComma = (str) => str.split(",");
 
+import FlowBaseInfoPanel from "./components/FlowBaseInfoPanel.vue";
+const OptionMixin = {
+  // components: {
+  //   FlowBaseInfoPanel: () => import("./components/FlowBaseInfoPanel"),
+  // },
+
+  data() {
+    return {
+      flowBaseInfo: {
+        // // 流程名称
+        // SchemeName: "",
+        // // 流程类型
+        // FrmType: "",
+        // whereStr: [],
+
+        SchemeName: "dafdafda",
+        FrmType: "flowschemeType_qingjia",
+        whereStr: [
+          {
+            CompanyCode: "D01D001",
+            Bumen: ["D01D003", "D01D004", "D01D005"],
+          },
+        ],
+      },
+
+      pageOptions: {
+        companyCodeOptiopns: [],
+        flowschemeTypeOptions: [],
+        liuchengtiaojianleixingOptions: [],
+        userOptions: [],
+        roleOptions: [],
+      },
+    };
+  },
+};
+
 export default {
   name: "FlowEdit",
+
+  mixins: [OptionMixin],
+
   components: {
     flowNode,
   },
@@ -243,43 +273,133 @@ export default {
       };
       console.log(JSON.stringify(toBackEndData));
     },
+
+    /**
+     * 获取页面下拉项
+     */
+    async getPageOptions() {
+      //         所属组织下拉ID: -1
+      // 流程类型下拉ID：flowschemeType
+      // 流程条件类型（自定义） 下拉ID:  liuchengtiaojianleixing
+      // 用户下拉ID：b5cab1b3-e486-4ae6-9d95-a849a710d72f
+      // 角色下拉ID：a97a2af4-edfb-4dcd-b606-25a21bbd9fda
+      // dicTypeID: "-1,flowschemeType,liuchengtiaojianleixing,b5cab1b3-e486-4ae6-9d95-a849a710d72f,a97a2af4-edfb-4dcd-b606-25a21bbd9fda",
+      let listOptions = [
+        {
+          dicTypeID: "-1",
+          dicTypeName: "所属组织",
+          key: "pageOptions.companyCodeOptiopns",
+        },
+        {
+          dicTypeID: "flowschemeType",
+          dicTypeName: "流程类型下拉ID",
+          key: "pageOptions.flowschemeTypeOptions",
+        },
+        {
+          dicTypeID: "liuchengtiaojianleixing",
+          dicTypeName: "流程条件类型（自定义） 下拉ID",
+          key: "pageOptions.liuchengtiaojianleixingOptions",
+        },
+        {
+          dicTypeID: "b5cab1b3-e486-4ae6-9d95-a849a710d72f",
+          dicTypeName: "用户下拉ID",
+          key: "pageOptions.userOptions",
+        },
+        {
+          dicTypeID: "a97a2af4-edfb-4dcd-b606-25a21bbd9fda",
+          dicTypeName: "角色下拉ID",
+          key: "pageOptions.roleOptions",
+        },
+      ];
+      await this.$getOptions.call(this, listOptions, true);
+    },
+
+    renderFlow() {
+      // 绘制流程
+      this.jsPlumb = jsPlumb.getInstance();
+      this.initNodeTypeObj();
+      this.initNode();
+      this.fixNodesPosition();
+      this.$nextTick(() => {
+        this.init();
+      });
+    },
+
+    /**
+     * 显示设置流程基本信息弹窗
+     */
+    showCreateFlowDialog() {
+      let h = this.$createElement;
+      let nodeItemConfigDialogMethods = {
+        done: function (event) {
+          console.log(event);
+          Object.assign(this.flowBaseInfo, event);
+          // TODO:
+          // 同步信息
+          // 关闭弹窗
+          this.$msgbox.close();
+        },
+        cancel: function () {
+          // 关闭弹窗
+          this.$msgbox.close();
+        },
+      };
+
+      Object.keys(nodeItemConfigDialogMethods).forEach((key) => {
+        nodeItemConfigDialogMethods[key] =
+          nodeItemConfigDialogMethods[key].bind(this);
+      });
+
+      let customClass = this.$style.nodeItemConfigDialog;
+
+      const DEFAULT_MSGBOX_CONFIG = {
+        showCancelButton: false,
+        showConfirmButton: false,
+        showClose: false,
+        closeOnClickModal: false,
+        callback(action, instance) {},
+      };
+
+      this.$msgbox({
+        ...DEFAULT_MSGBOX_CONFIG,
+        title: "流程基本信息设置",
+        customClass,
+        message: h(FlowBaseInfoPanel, {
+          props: {
+            pageOptions: this.pageOptions,
+            node: this.flowBaseInfo,
+          },
+          on: {
+            ...nodeItemConfigDialogMethods,
+          },
+        }),
+      });
+    },
   },
 
   async mounted() {
-    let [err, res] = await this.$to(getFlowDetial("DEBUG-888888"));
-    if (err) {
-      this.$message.error("获取流程异常, 请稍后再试");
+    // 获取下拉选项
+    this.getPageOptions();
+    let { mode, token } = this.$route.query;
+
+    if (mode === "add") {
+      this.$nextTick(() => {
+        this.showCreateFlowDialog();
+      });
       return;
     }
 
-    // res.nodeList.forEach((nodeItem) => {
-    //   nodeItem.setInfoList[0].whereStr = nodeItem.setInfoList[0].whereStr.map(
-    //     (item) => {
-    //       if (item.T_FieldName === "CompanyCode") {
-    //         item.userOptions = [];
-    //         item.roleOptions = [];
+    if (mode === "edit") {
+      let [err, res] = await this.$to(getFlowDetial("DEBUG-888888"));
+      if (err) {
+        this.$message.error("获取流程异常, 请稍后再试");
+        return;
+      }
+      Object.assign(this.data, res);
+      return;
+    }
 
-    //         item.T_Val.split("&")
-    //           .map(($item) => $item.split("="))
-    //           .forEach(($item) => {
-    //             let key = KEY_MAP && KEY_MAP[$item[0]];
-    //             console.log(`key: ${key}`);
-    //             item[key] = $item[1];
-    //           });
-    //       }
-    //       return item;
-    //     }
-    //   );
-    // });
-
-    Object.assign(this.data, res);
-    this.jsPlumb = jsPlumb.getInstance();
-    this.initNodeTypeObj();
-    this.initNode();
-    this.fixNodesPosition();
-    this.$nextTick(() => {
-      this.init();
-    });
+    this.renderFlow();
   },
 };
 </script>
@@ -391,5 +511,11 @@ export default {
   to {
     stroke-dashoffset: 0;
   }
+}
+</style>
+
+<style module>
+.nodeItemConfigDialog {
+  width: 800px !important;
 }
 </style>

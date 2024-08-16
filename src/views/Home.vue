@@ -130,28 +130,26 @@ const handleChange = {
 // 表格状态
 let actionStrategies = {
   search() {
-    debugger;
     this.handleFormSubmit();
   },
   // 查询
   add() {
-    debugger;
-    let componentProps = {
-      mode: "addUse",
-    };
-    // this.$openDialog(UserAddForm)(componentProps, this)
-    //   .then(() => {
-    //     // 刷新页面
-    //     console.log("刷新页面");
-    //     this.handleFormSubmit();
-    //   })
-    //   .catch(() => {
-    //     console.log("用户取消了");
-    //   });
+    this.$router.push({
+      name: "FlowDesign",
+      query: {
+        mode: "add",
+      },
+    });
   },
   // 查询
   editFlow(row) {
-    debugger;
+    this.$router.push({
+      name: "FlowDesign",
+      query: {
+        mode: "edit",
+        id: row.id,
+      },
+    });
   },
   // 人员清册详情
   viewDetial(row) {
