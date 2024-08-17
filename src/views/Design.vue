@@ -227,37 +227,35 @@ export default {
           NodeName: "",
           jop: "",
         });
-
         let setInfoItem = {
-          whereStr: get(item, "whereStr", [])
-            .map(whereStrItemAdapter)
-            .map((item) => {
-              debugger;
-              return pick(item, ["T_FieldName", "T_Operation", "T_Val"]);
-            }),
+          whereStr: get(item, "whereStr", []),
           type: shenpiObj.type,
           // NOTE:
           // - 不用区分类型直接对数据进行处理
           user: joinComma(shenpiObj.user),
           role: joinComma(shenpiObj.role),
         };
-
         obj.setInfoList = [setInfoItem];
         return obj;
       };
 
       let toJSON = (obj) => JSON.stringify(obj);
 
+      let SchemeCanUser = (this.flowBaseInfo.whereStr || []).map((item) => {
+        return pick(item, ["CompanyCode", "Bumen"]);
+      });
+      let SchemeContent = {
+        nodeList: this.data.nodeList.map(nodeAdapter),
+        lineList: this.data.lineList,
+      };
+
       // 流程数据回显
       let toBackEndData = {
         id: "",
         SchemeName: this.flowBaseInfo.SchemeName,
         FrmId: this.flowBaseInfo.FrmId,
-        SchemeCanUser: toJSON(this.flowBaseInfo.whereStr),
-        SchemeContent: toJSON({
-          nodeList: this.data.nodeList.map(nodeAdapter),
-          lineList: this.data.lineList,
-        }),
+        SchemeCanUser: toJSON(SchemeCanUser),
+        SchemeContent: toJSON(SchemeContent),
         Disabled: "0",
       };
 
@@ -354,29 +352,36 @@ export default {
     let isAddMode = mode === "add";
     this.isAddMode = isAddMode;
 
-    if (isAddMode) {
-      // TODO:
-      // 设置默认的节点、连线
-      Object.assign(this.data, DEFAULT_FLOW_DATA);
-      this.data;
-    }
+    let mix = Object.assign;
+    let flowHandlerStrategies = {
+      add: function () {
+        // TODO:
+        // - Remove Comment
+        // // 设置默认的节点、连线
+        // mix(this.data, DEFAULT_FLOW_DATA);
+        this.renderFlow();
+      },
+      edit: async function () {
+        let [err, res] = await this.$to(getFlowDetial(id));
+        if (err) {
+          this.$message.error("获取流程异常, 请稍后再试");
+          return;
+        }
+        let parseJSON = (str) => JSON.parse(str);
+        let obj$1 = pick(res, ["id", "SchemeName", "FrmId"]);
+        obj$1.whereStr = parseJSON(res.SchemeCanUser);
+        mix(this.flowBaseInfo, obj$1);
+        mix(this.data, parseJSON(res.SchemeContent));
+        this.renderFlow();
+      },
+      view: async function () {
+        flowHandlerStrategies.edit.call(this);
+      },
+    };
 
-    if (mode === "edit") {
-      let [err, res] = await this.$to(getFlowDetial(id));
-      if (err) {
-        this.$message.error("获取流程异常, 请稍后再试");
-        return;
-      }
-
-      let mix = Object.assign;
-      let parseJSON = (str) => JSON.parse(str);
-      let obj$1 = pick(res, ["id", "SchemeName", "FrmId"]);
-      obj$1.whereStr = parseJSON(res.SchemeCanUser);
-      mix(this.flowBaseInfo, obj$1);
-      mix(this.data, parseJSON(res.SchemeContent));
-    }
-
-    this.renderFlow();
+    let flowHandlerStrategy =
+      flowHandlerStrategies && flowHandlerStrategies[mode || "view"];
+    flowHandlerStrategy.call(this);
   },
 };
 </script>

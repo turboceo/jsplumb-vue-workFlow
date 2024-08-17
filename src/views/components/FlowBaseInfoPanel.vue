@@ -46,12 +46,12 @@
           :key="index"
         >
           <el-select
-            v-model="item.T_FieldName"
+            v-model="item.CompanyCode"
             placeholder="请选择"
             style="flex: 0 0 200px"
             @change="
-              (T_FieldName) =>
-                handleItemCompanyCodeChange(item, T_FieldName, true)
+              (CompanyCode) =>
+                handleItemCompanyCodeChange(item, CompanyCode, true)
             "
           >
             <el-option
@@ -104,7 +104,7 @@
 <script>
 let whereStrFactory = () => {
   return {
-    T_FieldName: "",
+    CompanyCode: "",
     Bumen: "",
     CompanyCode_Options: [],
     Bumen_Options: [],
@@ -212,16 +212,18 @@ export default {
     let node = this.node || {};
     // 遍历每一项判断是否需要调用接口
     node.whereStr = (node.whereStr || []).map((item) => {
-      console.log(item.T_FieldName, item.Bumen);
+      console.log(item.CompanyCode, item.Bumen);
       // 判断组织&部门是否有值
       // 部门需要联动组织进行查询
-      if (item.T_FieldName) {
+      if (item.CompanyCode) {
         console.log("联动啦...");
-        this.handleItemCompanyCodeChange(item, item.T_FieldName);
+        this.handleItemCompanyCodeChange(item, item.CompanyCode);
       }
       return item;
     });
     Object.assign(f, node);
+    // await this.$nextTick();
+    // this.$forceUpdate();
   },
 };
 </script>
