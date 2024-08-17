@@ -1,5 +1,8 @@
 import panzoom from "panzoom";
 import { GenNonDuplicateID } from "@/views/common/until";
+import cloneDeep from "lodash/cloneDeep";
+import { shenpiObjFactory } from "../components/factory";
+
 const methods = {
   init() {
     this.jsPlumb.ready(() => {
@@ -109,14 +112,17 @@ const methods = {
     })
   },
   drag(ele, item) {
-    this.currentItem = item;
+    // 深复制避免上一个审批节点配置的影响
+    let clonedItem = cloneDeep(item)
+    clonedItem.shenpi = shenpiObjFactory()
+    clonedItem.whereStr = []
+    this.currentItem = clonedItem;
   },
   drop(event) {
     const containerRect = this.jsPlumb.getContainer().getBoundingClientRect();
     const scale = this.getScale();
     let left = (event.pageX - containerRect.left - 60) / scale;
     let top = (event.pageY - containerRect.top - 20) / scale;
-
     var temp = {
       ...this.currentItem,
       id: GenNonDuplicateID(8),
