@@ -329,51 +329,59 @@ export default {
      * 显示设置流程基本信息弹窗
      */
     showCreateFlowDialog() {
-      let h = this.$createElement;
       let nodeItemConfigDialogMethods = {
         done: function (event) {
           console.log(event);
           Object.assign(this.flowBaseInfo, event);
-          // TODO:
-          // 同步信息
-          // 关闭弹窗
-          this.$msgbox.close();
         },
-        cancel: function () {
-          // 关闭弹窗
-          this.$msgbox.close();
-        },
+        cancel: function () {},
       };
 
-      Object.keys(nodeItemConfigDialogMethods).forEach((key) => {
-        nodeItemConfigDialogMethods[key] =
-          nodeItemConfigDialogMethods[key].bind(this);
-      });
+      this.$openDialog(FlowBaseInfoPanel)(
+        {
+          pageOptions: this.pageOptions,
+          node: this.flowBaseInfo,
+        },
+        this
+      )
+        .then((event) => {
+          debugger;
+          nodeItemConfigDialogMethods.done.call(this, event);
+        })
+        .catch(() => {
+          nodeItemConfigDialogMethods.cancel.call(this);
+        });
 
-      let customClass = this.$style.nodeItemConfigDialog;
+      // let h = this.$createElement;
+      // Object.keys(nodeItemConfigDialogMethods).forEach((key) => {
+      //   nodeItemConfigDialogMethods[key] =
+      //     nodeItemConfigDialogMethods[key].bind(this);
+      // });
 
-      const DEFAULT_MSGBOX_CONFIG = {
-        showCancelButton: false,
-        showConfirmButton: false,
-        showClose: false,
-        closeOnClickModal: false,
-        callback(action, instance) {},
-      };
+      // let customClass = this.$style.nodeItemConfigDialog;
 
-      this.$msgbox({
-        ...DEFAULT_MSGBOX_CONFIG,
-        title: "流程基本信息设置",
-        customClass,
-        message: h(FlowBaseInfoPanel, {
-          props: {
-            pageOptions: this.pageOptions,
-            node: this.flowBaseInfo,
-          },
-          on: {
-            ...nodeItemConfigDialogMethods,
-          },
-        }),
-      });
+      // const DEFAULT_MSGBOX_CONFIG = {
+      //   showCancelButton: false,
+      //   showConfirmButton: false,
+      //   showClose: false,
+      //   closeOnClickModal: false,
+      //   callback(action, instance) {},
+      // };
+
+      // this.$msgbox({
+      //   ...DEFAULT_MSGBOX_CONFIG,
+      //   title: "流程基本信息设置",
+      //   customClass,
+      //   message: h(FlowBaseInfoPanel, {
+      //     props: {
+      //       pageOptions: this.pageOptions,
+      //       node: this.flowBaseInfo,
+      //     },
+      //     on: {
+      //       ...nodeItemConfigDialogMethods,
+      //     },
+      //   }),
+      // });
     },
   },
 

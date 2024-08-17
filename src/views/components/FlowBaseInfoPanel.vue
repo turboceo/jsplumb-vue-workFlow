@@ -1,93 +1,104 @@
 <template>
-  <el-form
-    :model="ruleForm"
-    :rules="rules"
-    ref="ruleForm"
-    label-width="100px"
-    class="demo-ruleForm"
-    label-position="top"
+  <el-dialog
+    append-to-body
+    :visible.sync="dialogVideoVisible"
+    width="800"
+    center
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    :show-close="false"
+    title="流程基本信息"
   >
-    <el-form-item label="流程名称" prop="SchemeName" required>
-      <el-input
-        v-model="ruleForm.SchemeName"
-        placeholder="请填写流程名称"
-      ></el-input>
-    </el-form-item>
+    <el-form
+      :model="ruleForm"
+      :rules="rules"
+      ref="ruleForm"
+      label-width="100px"
+      class="demo-ruleForm"
+      label-position="top"
+    >
+      <el-form-item label="流程名称" prop="SchemeName" required>
+        <el-input
+          v-model="ruleForm.SchemeName"
+          placeholder="请填写流程名称"
+        ></el-input>
+      </el-form-item>
 
-    <el-form-item label="流程类型" prop="FrmId" required>
-      <el-select
-        v-model="ruleForm.FrmId"
-        placeholder="请选择流程类型"
-        style="width: 100%"
-      >
-        <el-option
-          v-for="item in pageOptions.flowschemeTypeOptions"
-          :key="item.ID"
-          :label="item.Name"
-          :value="item.ID"
-        ></el-option>
-      </el-select>
-    </el-form-item>
-
-    <el-form-item label="组织部门设置" required>
-      <div
-        style="display: flex; gap: 10px; margin-bottom: 8px"
-        v-for="(item, index) in ruleForm.whereStr"
-        :key="index"
-      >
+      <el-form-item label="流程类型" prop="FrmId" required>
         <el-select
-          v-model="item.CompanyCode"
-          placeholder="请选择"
-          style="flex: 0 0 200px"
-          @change="
-            (CompanyCode) =>
-              handleItemCompanyCodeChange(item, CompanyCode, true)
-          "
+          v-model="ruleForm.FrmId"
+          placeholder="请选择流程类型"
+          style="width: 100%"
         >
           <el-option
-            v-for="item in pageOptions.companyCodeOptiopns"
+            v-for="item in pageOptions.flowschemeTypeOptions"
+            :key="item.ID"
             :label="item.Name"
             :value="item.ID"
-            :key="item.ID"
           ></el-option>
         </el-select>
+      </el-form-item>
 
-        <el-select
-          v-model="item.Bumen"
-          placeholder="请选择部门"
-          style="flex: 1"
-          multiple
+      <el-form-item label="组织部门设置" required>
+        <div
+          style="display: flex; gap: 10px; margin-bottom: 8px"
+          v-for="(item, index) in ruleForm.whereStr"
+          :key="index"
         >
-          <el-option
-            v-for="item in item.Bumen_Options"
-            :label="item.Name"
-            :value="item.Id"
-            :key="item.Id"
-          ></el-option>
-        </el-select>
-      </div>
-    </el-form-item>
+          <el-select
+            v-model="item.CompanyCode"
+            placeholder="请选择"
+            style="flex: 0 0 200px"
+            @change="
+              (CompanyCode) =>
+                handleItemCompanyCodeChange(item, CompanyCode, true)
+            "
+          >
+            <el-option
+              v-for="item in pageOptions.companyCodeOptiopns"
+              :label="item.Name"
+              :value="item.ID"
+              :key="item.ID"
+            ></el-option>
+          </el-select>
 
-    <el-form-item>
-      <el-button
-        type="primary"
-        size="medium"
-        plain
-        @click="addWhereStr"
-        icon="el-icon-plus"
-        >添加条件</el-button
-      >
-    </el-form-item>
+          <el-select
+            v-model="item.Bumen"
+            placeholder="请选择部门"
+            style="flex: 1"
+            multiple
+          >
+            <el-option
+              v-for="item in item.Bumen_Options"
+              :label="item.Name"
+              :value="item.Id"
+              :key="item.Id"
+            ></el-option>
+          </el-select>
+        </div>
+      </el-form-item>
 
-    <el-form-item>
-      <div class="action-bar">
-        <el-button type="info" @click="closeDialog" icon="">取消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')" icon=""
-          >保存</el-button
+      <el-form-item>
+        <el-button
+          type="primary"
+          size="medium"
+          plain
+          @click="addWhereStr"
+          icon="el-icon-plus"
+          >添加条件</el-button
         >
-      </div>
-    </el-form-item>
-  </el-form>
+      </el-form-item>
+
+      <el-form-item>
+        <div class="action-bar">
+          <el-button type="info" @click="handleCancel" icon="">取消</el-button>
+          <el-button type="primary" @click="submitForm('ruleForm')" icon=""
+            >保存</el-button
+          >
+        </div>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
 </template>
 
 <script>
@@ -114,7 +125,27 @@ let ruleFormFactory = () => {
 // 所属组织-部门联动接口
 import { getChildDeptList } from "@/utils/service";
 
+const DiaglogMixin = {
+  data() {
+    return {
+      dialogVideoVisible: true,
+    };
+  },
+
+  methods: {
+    handleConfirm(payload) {
+      this.$emit("done", payload);
+    },
+
+    handleCancel() {
+      this.$emit("cancel");
+    },
+  },
+};
+
 export default {
+  mixins: [DiaglogMixin],
+
   props: {
     node: {
       type: Object,
@@ -179,16 +210,12 @@ export default {
       this.ruleForm.whereStr.push(whereStrFactory());
     },
 
-    closeDialog() {
-      this.$emit("cancel");
-    },
-
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
           return;
         }
-        this.$emit("done", this.ruleForm);
+        this.handleConfirm(this.ruleForm);
       });
     },
     resetForm(formName) {

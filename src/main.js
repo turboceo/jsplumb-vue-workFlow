@@ -24,6 +24,9 @@ import SqlPlugin from "@/plugin/sql";
 Vue.use(PyzlPlugin);
 Vue.use(SqlPlugin);
 
+import ElDialogHelper from "@springleo/el-dialog-helper";
+Vue.use(ElDialogHelper)
+
 /**
  * 判断当前用户是否拥有某个产品的权限
  * @param {Object} options
