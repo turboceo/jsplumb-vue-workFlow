@@ -96,6 +96,8 @@ import { shenpiObjFactory } from "./components/factory";
 let joinComma = (arr) => arr.join(",");
 let splitByComma = (str) => str.split(",");
 
+import { DEFAULT_FLOW_DATA } from "./config/const";
+
 import FlowBaseInfoPanel from "./components/FlowBaseInfoPanel.vue";
 const OptionMixin = {
   data() {
@@ -138,7 +140,7 @@ export default {
 
   computed: {
     shouldShowSaveFlowBtn() {
-      return this.query.mode !== "view";
+      return this.$route.query.mode !== "view";
     },
   },
 
@@ -284,12 +286,6 @@ export default {
      * 获取页面下拉项
      */
     async getPageOptions() {
-      //         所属组织下拉ID: -1
-      // 流程类型下拉ID：flowschemeType
-      // 流程条件类型（自定义） 下拉ID:  liuchengtiaojianleixing
-      // 用户下拉ID：b5cab1b3-e486-4ae6-9d95-a849a710d72f
-      // 角色下拉ID：a97a2af4-edfb-4dcd-b606-25a21bbd9fda
-      // dicTypeID: "-1,flowschemeType,liuchengtiaojianleixing,b5cab1b3-e486-4ae6-9d95-a849a710d72f,a97a2af4-edfb-4dcd-b606-25a21bbd9fda",
       let listOptions = [
         {
           dicTypeID: "-1",
@@ -358,37 +354,6 @@ export default {
         .catch(() => {
           dialogEventHandler.cancel.call(this);
         });
-
-      // let h = this.$createElement;
-      // Object.keys(nodeItemConfigDialogMethods).forEach((key) => {
-      //   nodeItemConfigDialogMethods[key] =
-      //     nodeItemConfigDialogMethods[key].bind(this);
-      // });
-
-      // let customClass = this.$style.nodeItemConfigDialog;
-
-      // const DEFAULT_MSGBOX_CONFIG = {
-      //   showCancelButton: false,
-      //   showConfirmButton: false,
-      //   showClose: false,
-      //   closeOnClickModal: false,
-      //   callback(action, instance) {},
-      // };
-
-      // this.$msgbox({
-      //   ...DEFAULT_MSGBOX_CONFIG,
-      //   title: "流程基本信息设置",
-      //   customClass,
-      //   message: h(FlowBaseInfoPanel, {
-      //     props: {
-      //       pageOptions: this.pageOptions,
-      //       node: this.flowBaseInfo,
-      //     },
-      //     on: {
-      //       ...nodeItemConfigDialogMethods,
-      //     },
-      //   }),
-      // });
     },
   },
 
@@ -403,79 +368,7 @@ export default {
     if (isAddMode) {
       // TODO:
       // 设置默认的节点、连线
-      Object.assign(this.data, {
-        nodeList: [
-          {
-            id: "58hcvdsbpgs000",
-            type: "start",
-            name: "开始",
-            top: "180px",
-            left: "180px",
-            setInfoList: [
-              {
-                whereStr: [
-                  {
-                    T_Operation: "",
-                    T_Val: "",
-                  },
-                ],
-                type: "selectByUser",
-                user: "",
-                role: "",
-              },
-            ],
-          },
-          {
-            id: "4g8p1kpr9wq000",
-            type: "node",
-            name: "审批节点",
-            top: "180px",
-            left: "420px",
-            setInfoList: [
-              {
-                whereStr: [
-                  {
-                    T_Operation: "",
-                    T_Val: "",
-                  },
-                ],
-                type: "selectByUser",
-                user: "",
-                role: "",
-              },
-            ],
-          },
-          {
-            id: "4dly1u357je000",
-            type: "end",
-            name: "结束",
-            top: "180px",
-            left: "695px",
-            setInfoList: [
-              {
-                whereStr: [
-                  {
-                    T_Operation: "",
-                    T_Val: "",
-                  },
-                ],
-                type: "selectByUser",
-                user: "",
-                role: "",
-              },
-            ],
-          },
-        ],
-        lineList: [
-          {
-            from: "58hcvdsbpgs000",
-            to: "4g8p1kpr9wq000",
-            label: "连线名称",
-            id: "8mphpw7u5oc00",
-            Remark: "",
-          },
-        ],
-      });
+      Object.assign(this.data, DEFAULT_FLOW_DATA);
       this.data;
     }
 
