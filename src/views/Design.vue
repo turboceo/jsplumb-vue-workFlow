@@ -7,9 +7,11 @@
       </div>
       <div class="flow_region--header---action">
         <el-button type="primary" @click="showCreateFlowDialog" plain
-          >配置流程基本信息</el-button
+          >配置/查看流程基本信息</el-button
         >
-        <el-button type="primary" @click="saveFlow">保存流程</el-button>
+        <el-button type="primary" @click="saveFlow" v-if="shouldShowSaveFlowBtn"
+          >保存流程</el-button
+        >
       </div>
     </div>
     <!-- 左测工具栏 -->
@@ -133,6 +135,12 @@ export default {
   name: "FlowEdit",
 
   mixins: [OptionMixin],
+
+  computed: {
+    shouldShowSaveFlowBtn() {
+      return this.query.mode !== "view";
+    },
+  },
 
   components: {
     flowNode,
