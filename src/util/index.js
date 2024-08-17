@@ -50,8 +50,16 @@ ajax.interceptors.response.use(
 
         if (code === 401) {
             localStorage.removeItem("token")
-            debugger
-            window.microApp.setGlobalData({ type: "authFailed", data: response })
+            // 告知外部系统授权异常
+            window.parent.postMessage(
+                {
+                    type: "pyzl:message",
+                    data: {
+                        event: "api:authFailed",
+                    },
+                },
+                "*"
+            );
             return
         }
 

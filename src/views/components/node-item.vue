@@ -112,14 +112,11 @@ export default {
 
       let dialogEventHandler = {
         done: function (event) {
-          debugger;
           Object.assign(node, event);
           // 设置节点名称
           this.$emit("setNodeName", node.id, node.name);
         },
-        cancel: function () {
-          debugger;
-        },
+        cancel: function () {},
       };
 
       if (node.type !== "node") return;

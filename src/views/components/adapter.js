@@ -4,6 +4,5 @@ export let whereStrItemAdapter = (item) => {
         T_Operation: item.T_Operation,
         T_Val: item.T_Val,
     }
-    debugger
     return obj;
 };

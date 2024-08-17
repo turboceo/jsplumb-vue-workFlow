@@ -6,10 +6,14 @@
         {{ flowBaseInfo.SchemeName }}
       </div>
       <div class="flow_region--header---action">
-        <el-button type="primary" @click="showCreateFlowDialog" plain
-          >配置/查看流程基本信息</el-button
+        <el-button size="small" type="info" @click="showCreateFlowDialog" plain
+          >配置流程基本信息</el-button
         >
-        <el-button type="primary" @click="saveFlow" v-if="shouldShowSaveFlowBtn"
+        <el-button
+          size="small"
+          type="primary"
+          @click="saveFlow"
+          v-if="shouldShowSaveFlowBtn"
           >保存流程</el-button
         >
       </div>
@@ -355,10 +359,8 @@ export default {
     let mix = Object.assign;
     let flowHandlerStrategies = {
       add: function () {
-        // TODO:
-        // - Remove Comment
         // // 设置默认的节点、连线
-        // mix(this.data, DEFAULT_FLOW_DATA);
+        mix(this.data, DEFAULT_FLOW_DATA);
         this.renderFlow();
       },
       edit: async function () {
@@ -402,6 +404,11 @@ export default {
     width: 600px;
     height: 70px;
     background: #409eff73;
+    background: linear-gradient(
+      90deg,
+      #a375e97d 0%,
+      rgba(197, 221, 249, 1) 100%
+    );
     border-radius: 0 0 10px 10px;
     font-size: 1.5em;
     display: flex;
