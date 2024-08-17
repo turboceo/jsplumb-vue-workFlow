@@ -8,7 +8,7 @@
     @click="setActive"
     @mouseenter="showAnchor"
     @mouseleave="hideAnchor"
-    @dblclick.prevent="K"
+    @dblclick.prevent="showSetNodeDialog"
     @contextmenu.prevent="onContextmenu"
   >
     <div class="log-wrap">
@@ -79,6 +79,7 @@ export default {
         minWidth: 180,
       });
     },
+
     setActive() {
       if (window.event.ctrlKey) {
         this.isSelected = !this.isSelected;
@@ -90,6 +91,7 @@ export default {
         this.$emit("changeLineState", this.node.id, true);
       }, 0);
     },
+
     setNotActive() {
       if (!window.event.ctrlKey) {
         this.isSelected = false;
@@ -100,66 +102,42 @@ export default {
       this.$emit("changeLineState", this.node.id, false);
       this.isActive = false;
     },
-    K() {
-      let node = this.node;
-      // 节点ID
-      let nodeId = node.id;
 
+    showSetNodeDialog() {
+      let node = this.node;
       console.log("log node: ");
       console.log(JSON.stringify(node));
 
       this.newNodeName = node.name;
-      const h = this.$createElement;
 
-      let nodeItemConfigDialogMethods = {
+      let dialogEventHandler = {
         done: function (event) {
           debugger;
           Object.assign(node, event);
           // 设置节点名称
           this.$emit("setNodeName", node.id, node.name);
-          // 关闭弹窗
-          this.$msgbox.close();
         },
         cancel: function () {
-          // 关闭弹窗
-          this.$msgbox.close();
+          debugger;
         },
       };
 
-      Object.keys(nodeItemConfigDialogMethods).forEach((key) => {
-        nodeItemConfigDialogMethods[key] =
-          nodeItemConfigDialogMethods[key].bind(this);
-      });
-
       if (node.type !== "node") return;
-
-      let customClass =
-        node.type === "node" ? this.$style.nodeItemConfigDialog : "";
-
-      const DEFAULT_MSGBOX_CONFIG = {
-        showCancelButton: false,
-        showConfirmButton: false,
-        showClose: false,
-        closeOnClickModal: false,
-        callback(action, instance) {},
-      };
-
-      this.$msgbox({
-        ...DEFAULT_MSGBOX_CONFIG,
-        title: "节点设置",
-        customClass,
-        message: h(NodeItemForm, {
-          key: nodeId,
-          props: {
-            node,
-            pageOptions: this.$store.state.pageOptions,
-          },
-          on: {
-            ...nodeItemConfigDialogMethods,
-          },
-        }),
-      });
+      this.$openDialog(NodeItemForm)(
+        {
+          node,
+          pageOptions: this.$store.state.pageOptions,
+        },
+        this
+      )
+        .then((event) => {
+          dialogEventHandler.done.call(this, event);
+        })
+        .catch(() => {
+          dialogEventHandler.cancel.call(this);
+        });
     },
+
     deleteNode() {
       this.$emit("deleteNode", this.node);
     },

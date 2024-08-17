@@ -329,7 +329,7 @@ export default {
      * 显示设置流程基本信息弹窗
      */
     showCreateFlowDialog() {
-      let nodeItemConfigDialogMethods = {
+      let dialogEventHandler = {
         done: function (event) {
           console.log(event);
           Object.assign(this.flowBaseInfo, event);
@@ -345,11 +345,10 @@ export default {
         this
       )
         .then((event) => {
-          debugger;
-          nodeItemConfigDialogMethods.done.call(this, event);
+          dialogEventHandler.done.call(this, event);
         })
         .catch(() => {
-          nodeItemConfigDialogMethods.cancel.call(this);
+          dialogEventHandler.cancel.call(this);
         });
 
       // let h = this.$createElement;

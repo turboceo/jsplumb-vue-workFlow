@@ -125,23 +125,7 @@ let ruleFormFactory = () => {
 // 所属组织-部门联动接口
 import { getChildDeptList } from "@/utils/service";
 
-const DiaglogMixin = {
-  data() {
-    return {
-      dialogVideoVisible: true,
-    };
-  },
-
-  methods: {
-    handleConfirm(payload) {
-      this.$emit("done", payload);
-    },
-
-    handleCancel() {
-      this.$emit("cancel");
-    },
-  },
-};
+import DiaglogMixin from "@/mixin/dialog";
 
 export default {
   mixins: [DiaglogMixin],
