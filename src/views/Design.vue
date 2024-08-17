@@ -109,17 +109,6 @@ const OptionMixin = {
         // 流程类型
         FrmId: "",
         whereStr: [],
-
-        // TODO:
-        // - Remove
-        // SchemeName: "dafdafda",
-        // FrmId: "flowschemeType_qingjia",
-        // whereStr: [
-        //   {
-        //     CompanyCode: "D01D001",
-        //     Bumen: ["D01D003", "D01D004", "D01D005"],
-        //   },
-        // ],
       },
 
       pageOptions: {

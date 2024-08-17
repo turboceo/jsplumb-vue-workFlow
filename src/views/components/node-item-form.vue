@@ -21,6 +21,7 @@
         <el-input v-model="ruleForm.name"></el-input>
       </el-form-item>
 
+      <!-- 审批设置 -->
       <el-form-item label="审批人">
         <div style="display: flex; gap: 10px; margin-bottom: 8px">
           <el-select
@@ -200,13 +201,6 @@ export default {
   async created() {
     let f = this.ruleForm;
     let node = this.node;
-
-    // TODO:
-    // -REMOVE
-    node.whereStr = node.whereStr.map((item) => {
-      return item;
-    });
-
     Object.assign(f, node);
   },
 };

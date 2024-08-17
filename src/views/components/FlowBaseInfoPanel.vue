@@ -46,12 +46,12 @@
           :key="index"
         >
           <el-select
-            v-model="item.CompanyCode"
+            v-model="item.T_FieldName"
             placeholder="请选择"
             style="flex: 0 0 200px"
             @change="
-              (CompanyCode) =>
-                handleItemCompanyCodeChange(item, CompanyCode, true)
+              (T_FieldName) =>
+                handleItemCompanyCodeChange(item, T_FieldName, true)
             "
           >
             <el-option
@@ -104,7 +104,7 @@
 <script>
 let whereStrFactory = () => {
   return {
-    CompanyCode: "",
+    T_FieldName: "",
     Bumen: "",
     CompanyCode_Options: [],
     Bumen_Options: [],
@@ -172,14 +172,14 @@ export default {
   methods: {
     async handleItemCompanyCodeChange(
       item,
-      companyCode,
+      T_FieldName,
       shouldResetData = false
     ) {
       if (shouldResetData) {
-        this.CompanyCode = [];
+        this.T_FieldName = [];
         item.Bumen = [];
       }
-      let res = await getChildDeptList(companyCode);
+      let res = await getChildDeptList(T_FieldName);
       if (res.code !== 200) return;
       // 调整部门下拉列表
       let deptList = res.data || [];
@@ -212,12 +212,12 @@ export default {
     let node = this.node || {};
     // 遍历每一项判断是否需要调用接口
     node.whereStr = (node.whereStr || []).map((item) => {
-      console.log(item.CompanyCode, item.Bumen);
+      console.log(item.T_FieldName, item.Bumen);
       // 判断组织&部门是否有值
       // 部门需要联动组织进行查询
-      if (item.CompanyCode) {
+      if (item.T_FieldName) {
         console.log("联动啦...");
-        this.handleItemCompanyCodeChange(item, item.CompanyCode);
+        this.handleItemCompanyCodeChange(item, item.T_FieldName);
       }
       return item;
     });
